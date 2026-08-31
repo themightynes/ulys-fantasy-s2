@@ -18,6 +18,9 @@
        site consumes ts today — parse with Date.parse() if you ever do.
      - refresh() → fetches approved rows; resolves with them and dispatches
        a 'ufstore:updated' event on window so pages can re-render.
+     - addVote(id) → POSTs {action:'vote', id}; resolves {ok:true, votes}
+       (votes = the new server count), rejects with a user-safe Error.
+       Approved rows carry a numeric `votes` field (default 0).
      - setStatus() → throws; moderation lives in the Google Sheet.
    ========================================================================== */
 (function () {
@@ -31,7 +34,7 @@
       id: 'seed-1',
       name: 'Uly · The Head Hottie',
       team: "Idk he's just hot",
-      quote: 'Founded the league. Wears the jersey like it owes him money. №1 was never in doubt.',
+      quote: 'Football isn\'t that hard. The internet\'s favorite tight end.',
       credit: '@uly',
       isCommish: true,
       isCommishPhoto: true,
@@ -80,6 +83,10 @@
         why: String(data.why || '').trim(),
         pos: String(data.pos || '').trim(),
         photo: String(data.photo || '').trim(),
+        // Optional base64 data-URL from the file upload; the backend saves
+        // it to Drive and writes the Drive thumbnail URL into the photo
+        // column (overriding any pasted link).
+        photoData: String(data.photoData || ''),
         ig: String(data.ig || '').trim(),
         hp: String(data.hp || '')
       };
@@ -100,11 +107,52 @@
           payload.status = 'pending';
           payload.ts = new Date().toISOString(); // ISO string, like refresh() rows
           delete payload.hp;
+          delete payload.photoData; // the record travels light — Drive has the bytes
           return payload;
         })
         .catch(function (err) {
           // Only user-safe messages escape; raw fetch/parse errors become
           // the friendly Besties HQ line.
+          throw (err && err.ufSafe) ? err : friendlyError();
+        });
+    },
+
+    /**
+     * Send a kiss (+1 vote) to an approved submission. Same text/plain
+     * no-preflight POST pattern as addSubmission. Resolves {ok:true, votes}
+     * with the authoritative server count; rejects with a user-safe Error
+     * (unknown id, not approved, network down, or an old deployed backend
+     * that predates voting — its submission validator rejects the body).
+     * On success the cached row is updated and 'ufstore:updated' fires so
+     * every later render sees the fresh count.
+     */
+    addVote: function (id) {
+      id = String(id || '').trim();
+      return fetch(UF_BACKEND_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'vote', id: id }), // string body → text/plain, simple request
+        redirect: 'follow'
+      })
+        .then(function (res) {
+          if (!res.ok) throw friendlyError();
+          return res.json();
+        })
+        .then(function (out) {
+          if (!out || out.ok !== true) {
+            throw (out && out.error) ? safeError(String(out.error)) : friendlyError();
+          }
+          var votes = Number(out.votes) || 0;
+          for (var i = 0; i < approvedCache.length; i++) {
+            if (approvedCache[i].id === id) { approvedCache[i].votes = votes; break; }
+          }
+          try {
+            window.dispatchEvent(new CustomEvent('ufstore:updated', {
+              detail: { approved: approvedCache.slice() }
+            }));
+          } catch (e) { /* event construction never blocks the data path */ }
+          return { ok: true, votes: votes };
+        })
+        .catch(function (err) {
           throw (err && err.ufSafe) ? err : friendlyError();
         });
     },
@@ -137,6 +185,7 @@
           approvedCache = rows.map(function (r) {
             r = r || {};
             r.status = 'approved'; // keep the UFStore record contract
+            r.votes = Number(r.votes) || 0; // old backends send no votes field
             return r;
           });
           try {

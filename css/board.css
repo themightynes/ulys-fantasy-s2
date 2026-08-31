@@ -240,6 +240,68 @@
   flex-shrink: 0;
 }
 
+/* ---- Kisses (fan-card voting) ---- */
+.slot__kiss {
+  position: relative; /* anchors the ::before tap-target extender */
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+  color: var(--pink);
+  border: 1px solid var(--pink);
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+/* Button box is ~27px tall; -12px/-8px inset = 51px effective hit area (>=44px). */
+.slot__kiss::before { content: ""; position: absolute; inset: -12px -8px; }
+.slot__kiss:hover {
+  background: var(--pink);
+  color: #fff;
+}
+.slot__kiss:active {
+  background: var(--pink-deep);
+  border-color: var(--pink-deep);
+  color: #fff;
+}
+.slot__kiss:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+/* Already kissed: filled + deepened, reads as pressed, no pointer affordance. */
+.slot__kiss--kissed,
+.slot__kiss--kissed:hover,
+.slot__kiss--kissed:active {
+  background: var(--pink-deep);
+  border-color: var(--pink-deep);
+  color: #fff; /* 5.3:1 on pink-deep — bubblegum misses the 4.5:1 bar at 11px */
+  cursor: default;
+}
+.slot__kiss-lips { font-size: 13px; line-height: 1; }
+
+/* ---- FAN FAVORITE badge (pink — gold stays reserved for Uly/№1) ---- */
+.slot__fave {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  z-index: 2;
+  background: var(--pink);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: var(--ls-display);
+  padding: 5px 10px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 /* ---- Empty slot ---- */
 .slot__empty-inner {
   flex: 1;

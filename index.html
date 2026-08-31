@@ -172,8 +172,16 @@
             </select>
           </div>
           <div class="scout__field">
-            <label class="scout__label" for="f-photo">Photo link <span class="scout__opt">(optional)</span></label>
-            <input class="scout__input" id="f-photo" name="photo" type="url" autocomplete="off" placeholder="https://…">
+            <label class="scout__label" for="f-photo-file">Photo <span class="scout__opt">(optional)</span></label>
+            <input class="scout__input scout__file" id="f-photo-file" name="photoFile" type="file" accept="image/*" aria-describedby="f-photo-help">
+            <div class="scout__preview" id="f-photo-preview" hidden>
+              <img class="scout__preview-img" id="f-photo-thumb" src="" alt="Selected photo preview" width="72" height="72">
+              <span class="scout__preview-name" id="f-photo-filename"></span>
+              <button class="scout__preview-remove" id="f-photo-remove" type="button" aria-label="Remove selected photo">✕</button>
+            </div>
+            <p class="scout__opt scout__file-help" id="f-photo-help">or paste a link below</p>
+            <label class="visually-hidden" for="f-photo">Photo link (optional)</label>
+            <input class="scout__input scout__input--secondary" id="f-photo" name="photo" type="url" autocomplete="off" placeholder="https://…">
           </div>
         </div>
 
@@ -231,6 +239,7 @@
       </div>
 
       <script src="js/store.js" defer></script>
+      <script src="js/story-card.js" defer></script>
       <script src="js/form.js" defer></script>
     </section>
 
@@ -238,7 +247,7 @@
     <section id="board" class="board-link" aria-labelledby="board-link-label">
       <p id="board-link-label" class="label label--wide board-link__label">Already scouted</p>
       <a class="display board-link__cta" href="board.html">See the live Hottie Board →</a>
-      <p class="editorial board-link__tagline">Every prospect. Every grade. Updated as Besties HQ deliberates.</p>
+      <p class="editorial board-link__tagline">All the current hotties at Uly's fingertips.</p>
       <p class="board-link__tagline">New to the league? <a class="link-tap" href="cast.html">Meet the Season 1 Cast →</a></p>
     </section>
   </main>

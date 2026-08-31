@@ -33,6 +33,11 @@
     consent: document.getElementById('f-consent'),
     hp: document.getElementById('f-hp') // honeypot — humans never see or fill it
   };
+  var photoFile = document.getElementById('f-photo-file');
+  var photoPreview = document.getElementById('f-photo-preview');
+  var photoThumb = document.getElementById('f-photo-thumb');
+  var photoFilename = document.getElementById('f-photo-filename');
+  var photoRemove = document.getElementById('f-photo-remove');
   var counter = document.getElementById('f-why-count');
   var counterSR = document.getElementById('f-why-sr');
   var srZone = 'ok'; // 'ok' ≤250 · 'hot' 251–279 · 'max' 280
@@ -92,6 +97,88 @@
   fields.consent.addEventListener('change', function () { refresh(); clearError(); });
   refresh();
 
+  /* ---- Photo upload (compress client-side at select time) ---------------- */
+  var PHOTO_MAX_SIDE = 1200;      // longest side after resize
+  var PHOTO_JPEG_QUALITY = 0.82;
+  var PHOTO_MAX_BYTES = 4 * 1024 * 1024; // ~4MB decoded, post-compression
+  var PHOTO_ERROR = "That photo is too big even after we squeezed it. Try a smaller one — Besties HQ doesn't need the RAW file.";
+  var photoData = ''; // base64 data-URL of the compressed selection ('' = none)
+
+  function clearPhoto() {
+    photoData = '';
+    if (photoFile) photoFile.value = '';
+    if (photoPreview) photoPreview.hidden = true;
+    if (photoThumb) photoThumb.src = '';
+    if (photoFilename) photoFilename.textContent = '';
+  }
+
+  /** Read `file`, downscale to ≤1200px longest side, export JPEG q.82.
+   *  Resolves the data-URL or rejects with a user-safe Error. */
+  function compressPhoto(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        try {
+          var scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+          var w = Math.max(1, Math.round(img.naturalWidth * scale));
+          var h = Math.max(1, Math.round(img.naturalHeight * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          var cctx = canvas.getContext('2d');
+          cctx.fillStyle = '#FFFFFF'; // JPEG has no alpha — composite
+          cctx.fillRect(0, 0, w, h); // transparent PNGs onto white, not black
+          cctx.drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL('image/jpeg', PHOTO_JPEG_QUALITY);
+          // decoded bytes ≈ base64 length × 3/4 — keep under ~4MB so the
+          // backend's 5MB decoded ceiling always clears too
+          var b64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+          if (b64.length * 0.75 > PHOTO_MAX_BYTES) {
+            reject(new Error(PHOTO_ERROR));
+            return;
+          }
+          resolve(dataUrl);
+        } catch (e) {
+          reject(new Error("Couldn't read that photo. Try a JPG or PNG."));
+        }
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("Couldn't read that photo. Try a JPG or PNG."));
+      };
+      img.src = url;
+    });
+  }
+
+  if (photoFile) {
+    photoFile.addEventListener('change', function () {
+      clearError();
+      var file = photoFile.files && photoFile.files[0];
+      if (!file) { clearPhoto(); return; }
+      compressPhoto(file)
+        .then(function (dataUrl) {
+          photoData = dataUrl;
+          if (photoThumb) photoThumb.src = dataUrl;
+          if (photoFilename) photoFilename.textContent = file.name;
+          if (photoPreview) photoPreview.hidden = false;
+          refresh();
+        })
+        .catch(function (err) {
+          clearPhoto();
+          errorEl.textContent = (err && err.message) || "Couldn't read that photo. Try a JPG or PNG.";
+        });
+    });
+  }
+  if (photoRemove) {
+    photoRemove.addEventListener('click', function () {
+      clearPhoto();
+      clearError();
+      if (photoFile) photoFile.focus();
+    });
+  }
+
   var submitting = false;
   var submitLabel = submitBtn.textContent;
 
@@ -119,6 +206,7 @@
           why: fields.why.value,
           pos: fields.pos.value,
           photo: fields.photo.value,
+          photoData: photoData, // '' when no upload; adapters treat as absent
           ig: fields.ig.value,
           hp: fields.hp ? fields.hp.value : ''
         });
@@ -140,6 +228,7 @@
 
   /* ---- Takeover ----------------------------------------------------------- */
   function openTakeover(name) {
+    lastScoutedName = name || '';
     confirmLine.textContent = (name || 'Your prospect') +
       ' has been filed with Besties HQ. Grades drop on draft day.';
     shareBtn.textContent = 'Share to story';
@@ -161,6 +250,7 @@
     document.body.style.overflow = '';
     document.removeEventListener('keydown', onKeydown, true);
     form.reset();
+    clearPhoto(); // form.reset() doesn't clear the stashed data-URL/preview
     refresh();
     clearError();
     if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
@@ -187,13 +277,54 @@
     }
   }
 
-  shareBtn.addEventListener('click', function () {
+  /* Text-only share — the final fallback if the story graphic can't render. */
+  function shareTextOnly() {
     if (navigator.share) {
       navigator.share({ text: SHARE_TEXT }).catch(function () {});
     } else if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(SHARE_TEXT).catch(function () {});
     }
     shareBtn.textContent = 'Copied — paste to story';
+  }
+
+  var lastScoutedName = '';
+  var sharing = false;
+
+  shareBtn.addEventListener('click', function () {
+    if (sharing) return;
+    if (!window.UFStoryCard || !window.UFStoryCard.generate) {
+      shareTextOnly();
+      return;
+    }
+    sharing = true;
+    shareBtn.textContent = 'Making your graphic…';
+    window.UFStoryCard.generate(lastScoutedName)
+      .then(function (blob) {
+        var file = new File([blob], 'my-hottie.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          return navigator.share({ files: [file], text: SHARE_TEXT })
+            .then(function () { shareBtn.textContent = 'Shared — go post it!'; })
+            .catch(function () { shareBtn.textContent = 'Share to story'; });
+        }
+        // No file-share support (desktop): download the PNG + copy the caption.
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'my-hottie.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(SHARE_TEXT).catch(function () {});
+        }
+        shareBtn.textContent = 'Graphic saved — post it!';
+      })
+      .catch(function () {
+        // Canvas/font failure — keep the old text-only behavior alive.
+        shareTextOnly();
+      })
+      .then(function () { sharing = false; });
   });
 
   againBtn.addEventListener('click', closeTakeover);

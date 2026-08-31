@@ -9,6 +9,7 @@
 
   var MIN_SLOTS = 12;
   var STORE_KEY = 'ufs2.submissions.v1';
+  var KISSED_KEY = 'ufs2.kissed.v1'; // JSON array of entry ids this browser kissed
 
   var grid = document.getElementById('board-grid');
   var countEl = document.getElementById('picks-filed');
@@ -32,6 +33,36 @@
       if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
     } catch (e) { /* not a URL */ }
     return null;
+  }
+
+  /* ---------- kisses (one per browser per entry) ---------- */
+
+  function readKissed() {
+    try {
+      var parsed = JSON.parse(window.localStorage.getItem(KISSED_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function writeKissed(list) {
+    try {
+      window.localStorage.setItem(KISSED_KEY, JSON.stringify(list));
+    } catch (e) { /* storage unavailable — kiss just won't persist */ }
+  }
+
+  function isKissed(id) {
+    return readKissed().indexOf(id) !== -1;
+  }
+
+  function setKissed(id, on) {
+    var list = readKissed();
+    var at = list.indexOf(id);
+    if (on && at === -1) list.push(id);
+    else if (!on && at !== -1) list.splice(at, 1);
+    else return;
+    writeKissed(list);
   }
 
   function atHandle(ig) {
@@ -89,10 +120,67 @@
     return frame;
   }
 
+  /** The 💋 button in an approved fan card's footer. All state text goes
+   *  through textContent; one kiss per browser per entry (KISSED_KEY). */
+  function kissButton(pick) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'slot__kiss';
+    var kissed = isKissed(pick.id);
+    btn.setAttribute('aria-label', 'Send a kiss to ' + pick.name);
+    btn.setAttribute('aria-pressed', kissed ? 'true' : 'false');
+    if (kissed) btn.classList.add('slot__kiss--kissed');
+
+    var lips = el('span', 'slot__kiss-lips', '💋');
+    lips.setAttribute('aria-hidden', 'true');
+    var count = el('span', 'slot__kiss-count', String(Number(pick.votes) || 0));
+    btn.appendChild(lips);
+    btn.appendChild(count);
+
+    btn.addEventListener('click', function () {
+      if (isKissed(pick.id)) return; // one kiss per browser per entry
+
+      // Optimistic: mark + bump immediately, revert if the store rejects.
+      var before = Number(count.textContent) || 0;
+      setKissed(pick.id, true);
+      count.textContent = String(before + 1);
+      btn.setAttribute('aria-pressed', 'true');
+      btn.classList.add('slot__kiss--kissed');
+
+      /* Guarded like the refresh() call below: local store.js has addVote
+         too, but an old deployed adapter may not. No addVote → the
+         optimistic state simply stands for this session. */
+      if (window.UFStore && typeof window.UFStore.addVote === 'function') {
+        window.UFStore.addVote(pick.id).then(function (out) {
+          if (out && out.votes != null) count.textContent = String(Number(out.votes) || 0);
+          renderBoard(); // authoritative count may move the FAN FAVORITE badge
+        }, function () {
+          // Rejected (unknown id, not approved, network, pre-vote backend):
+          // undo the kiss so the fan can try again later.
+          setKissed(pick.id, false);
+          count.textContent = String(before);
+          btn.setAttribute('aria-pressed', 'false');
+          btn.classList.remove('slot__kiss--kissed');
+        });
+      }
+    });
+    return btn;
+  }
+
+  function faveBadge() {
+    var badge = el('span', 'slot__fave');
+    badge.appendChild(document.createTextNode('Fan favorite '));
+    var lips = el('span', null, '💋');
+    lips.setAttribute('aria-hidden', 'true');
+    badge.appendChild(lips);
+    return badge;
+  }
+
   function filledCard(n, pick) {
     var isCommish = !!pick.isCommish;
     var card = el('article', 'slot slot--filled' + (pick.isCommishPhoto ? ' slot--gold' : ''));
     card.appendChild(numTag(n, pick.isCommishPhoto ? 'gold' : 'pink'));
+    if (pick.isFave) card.appendChild(faveBadge());
 
     if (pick.isCommishPhoto) {
       card.appendChild(commishPhoto(pick));
@@ -120,6 +208,9 @@
     foot.appendChild(credit);
     if (isCommish) {
       foot.appendChild(el('span', 'slot__commish', 'Uly’s pick'));
+    }
+    if (pick.isFan) {
+      foot.appendChild(kissButton(pick));
     }
     body.appendChild(foot);
     card.appendChild(body);
@@ -172,13 +263,27 @@
       frag.appendChild(filledCard(n++, pick));
     });
 
+    // FAN FAVORITE: most kisses among approved fans (votes > 0 only).
+    // `approved` is oldest-first from both adapters, so on a tie the first
+    // hit = the earliest submission. Board ORDER never changes.
+    var faveId = null;
+    var faveVotes = 0;
+    approved.forEach(function (sub) {
+      var v = Number(sub.votes) || 0;
+      if (v > faveVotes) { faveVotes = v; faveId = sub.id; }
+    });
+
     approved.forEach(function (sub) {
       frag.appendChild(filledCard(n++, {
+        id: sub.id,
         name: sub.name,
         team: sub.team,
         quote: sub.why,
         credit: atHandle(sub.ig),
         photo: sub.photo,
+        votes: Number(sub.votes) || 0,
+        isFan: true,
+        isFave: sub.id === faveId,
         isCommish: false,
         isCommishPhoto: false
       }));

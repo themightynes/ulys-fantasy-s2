@@ -290,6 +290,16 @@
   var lastScoutedName = '';
   var sharing = false;
 
+  /* Client decision: the share button is mobile-only — desktop browsers'
+     file-share support is unreliable, and the story graphic is an Instagram
+     flow anyway. Mobile = touch-first pointer + Web Share file support. */
+  var isMobileShare = window.matchMedia('(pointer: coarse)').matches &&
+    !!(navigator.canShare && navigator.share);
+  if (!isMobileShare && shareBtn) {
+    shareBtn.hidden = true;
+    shareBtn.setAttribute('aria-hidden', 'true');
+  }
+
   shareBtn.addEventListener('click', function () {
     if (sharing) return;
     if (!window.UFStoryCard || !window.UFStoryCard.generate) {

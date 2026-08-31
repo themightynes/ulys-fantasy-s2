@@ -111,6 +111,16 @@
     }, { capture: true, once: true });
   });
 
+  /* The @ is decoration on the field — strip any typed/pasted @ so handles
+     store bare and the board's atHandle() adds exactly one. */
+  if (fields.ig) {
+    fields.ig.addEventListener('input', function () {
+      if (/^@/.test(fields.ig.value)) {
+        fields.ig.value = fields.ig.value.replace(/^@+/, '');
+      }
+    });
+  }
+
   ['name', 'team', 'why', 'pos', 'photo', 'ig'].forEach(function (k) {
     fields[k].addEventListener('input', function () { refresh(); clearError(); });
   });

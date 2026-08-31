@@ -188,7 +188,8 @@
 
         <div class="scout__field">
           <label class="scout__label" for="f-ig">Your IG handle <span class="scout__opt">(optional — for credit)</span></label>
-          <input class="scout__input" id="f-ig" name="ig" type="text" autocomplete="off" placeholder="@yourhandle">
+          <span class="scout__ig-wrap"><span class="scout__ig-at" aria-hidden="true">@</span><input class="scout__input scout__input--ig" id="f-ig" name="ig" type="text" autocomplete="off" placeholder="yourhandle" aria-describedby="f-ig-note"></span>
+          <span class="scout__helper" id="f-ig-note">the @ is on us</span>
         </div>
 
         <!-- Honeypot: humans never see this; bots that fill it are dropped server-side -->

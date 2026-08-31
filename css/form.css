@@ -491,3 +491,27 @@
   height: 1px;
   overflow: hidden;
 }
+
+/* IG handle: permanent @ prefix inside the field */
+.scout__ig-wrap { position: relative; display: block; }
+.scout__ig-at {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--pink);
+  pointer-events: none;
+}
+.scout__input--ig { width: 100%; padding-left: 34px; }
+.scout__helper {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  font-style: italic;
+  font-family: var(--font-editorial);
+  font-size: 14px;
+}

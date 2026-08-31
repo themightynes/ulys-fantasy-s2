@@ -300,25 +300,37 @@
     shareBtn.textContent = 'Making your graphic…';
     window.UFStoryCard.generate(lastScoutedName)
       .then(function (blob) {
+        // Download + caption-copy — used when file-share is unsupported OR the
+        // share call fails (desktop browsers often claim support then reject
+        // because the user-activation window expired during canvas rendering).
+        function downloadCard() {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = 'my-hottie.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(SHARE_TEXT).catch(function () {});
+          }
+          shareBtn.textContent = 'Graphic saved — post it!';
+        }
         var file = new File([blob], 'my-hottie.png', { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           return navigator.share({ files: [file], text: SHARE_TEXT })
             .then(function () { shareBtn.textContent = 'Shared — go post it!'; })
-            .catch(function () { shareBtn.textContent = 'Share to story'; });
+            .catch(function (err) {
+              if (err && err.name === 'AbortError') {
+                // User closed the share sheet on purpose — don't force a file on them.
+                shareBtn.textContent = 'Share to story';
+              } else {
+                downloadCard();
+              }
+            });
         }
-        // No file-share support (desktop): download the PNG + copy the caption.
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'my-hottie.png';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(SHARE_TEXT).catch(function () {});
-        }
-        shareBtn.textContent = 'Graphic saved — post it!';
+        downloadCard();
       })
       .catch(function () {
         // Canvas/font failure — keep the old text-only behavior alive.

@@ -262,19 +262,13 @@
   function drawLowerThird(ctx) {
     var x = 100;
     var w = W - 200;
-    var blockY = 1420;
-    var blockH = 130;
-    var barH = 104;
+    var blockY = 1666; // chrome bar only — the wink card owns the space above
+    var blockH = 0;
+    var barH = 118;
 
     ctx.save();
-    // navy block
-    ctx.fillStyle = NAVY;
-    ctx.fillRect(x, blockY, w, blockH);
-    ctx.fillStyle = WHITE;
-    ctx.font = font('72px Anton, sans-serif');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText("ULY'S FANTASY S2", W / 2, blockY + blockH / 2 + 4);
 
     // chrome gradient bar
     var g = ctx.createLinearGradient(0, blockY + blockH, 0, blockY + blockH + barH);
@@ -335,9 +329,9 @@
 
   function drawWinkCard(ctx) {
     if (!winkImg) return;
-    var size = 250;
-    var cx = W - 175;
-    var cy = 1358;
+    var size = 400;
+    var cx = W / 2 + 150;
+    var cy = 1420;
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(4 * Math.PI / 180);
@@ -365,7 +359,6 @@
     drawPlate(ctx, playerName);
     drawWinkCard(ctx);
     drawLowerThird(ctx);
-    drawLinkBar(ctx);
 
     return canvas;
   }

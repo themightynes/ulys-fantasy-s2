@@ -485,6 +485,15 @@
 
   againBtn.addEventListener('click', closeTakeover);
 
+  /* Warm the Hottie Board while the visitor is still reading the form page:
+     one idle-time refresh fills the shared localStorage cache so board.html
+     paints instantly when they click through. */
+  var warm = function () {
+    if (window.UFStore && typeof window.UFStore.refresh === 'function') window.UFStore.refresh();
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 4000 });
+  else setTimeout(warm, 2500);
+
   /* ---- Preview hook ------------------------------------------------------- */
   if (preview === 'confirm') {
     openTakeover('');

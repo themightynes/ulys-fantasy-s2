@@ -46,7 +46,15 @@
   Object.freeze(seedPicks);
 
   /* Last successfully fetched approved rows, oldest first. */
+  var CACHE_KEY = 'ufs2.approvedCache.v1';
+
+  /* Stale-while-revalidate: paint the last-seen board instantly, refresh in
+     the background. localStorage failures (private mode) degrade silently. */
   var approvedCache = [];
+  try {
+    var saved = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
+    if (Array.isArray(saved)) approvedCache = saved;
+  } catch (e) { /* cold start */ }
 
   /* Errors we intentionally throw are tagged ufSafe: their message can be
      shown to the user. Anything untagged (fetch's own TypeError, JSON parse
@@ -213,6 +221,7 @@
             r.votes = Number(r.votes) || 0; // old backends send no votes field
             return r;
           });
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(approvedCache)); } catch (e) { /* full/private */ }
           try {
             window.dispatchEvent(new CustomEvent('ufstore:updated', {
               detail: { approved: approvedCache.slice() }

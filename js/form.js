@@ -12,7 +12,7 @@
 
   var CLOSE_TS = new Date('2026-09-06T23:59:59').getTime();
   var ERROR_MSG = 'Name, team, the case for him, and the consent box are required.';
-  var SHARE_TEXT = "I just scouted a Current Hottie for Uly's Fantasy S2. Draft day is Mon Sep 7. 💋 SUBMIT A HOTTIE";
+  var SHARE_TEXT = "I just scouted a Current Hottie for Uly's Fantasy S2. Draft day is Mon Sep 7. 💋 SUBMIT A HOTTIE → hotties.ulyandernesto.com";
 
   var form = document.getElementById('scout-form');
   var closed = document.getElementById('scout-closed');

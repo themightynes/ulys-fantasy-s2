@@ -26,7 +26,7 @@
 (function () {
   'use strict';
 
-  var UF_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw3sdmiWU7DVoQ7cMf7trLF64mcLjYLCH3S3aG3R0UpwJ13S6B7x7LYOchOZq6rmeEgmg/exec';
+  var UF_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw7pPXPWWhn_wwTEnTiqwThPXX64iAXUfcdgE2cj2t_SVfdn81ZWb8TGJhqcWson1zhtQ/exec';
 
   /* The seeded №1 pick — Uly himself. Identical to js/store.js. */
   var seedPicks = [

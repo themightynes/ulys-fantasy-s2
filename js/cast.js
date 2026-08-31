@@ -55,8 +55,12 @@
   ];
 
   var ROOKIES = [
-    { name: 'Hazel', bio: '"Uly’s cousin. New cast member added to Season 2."' },
-    { name: 'Evelyng', bio: '"Uly’s cousin. New cast member added to Season 2."' }
+    { name: 'Hazel', bio: '"Uly’s cousin. New cast member added to Season 2."',
+      photo: { src: 'assets/img/cast/hazel.jpg', width: 900, height: 1200,
+        alt: 'Hazel — Season 2 rookie cast member' } },
+    { name: 'Evelyng', bio: '"Uly’s cousin. New cast member added to Season 2."',
+      photo: { src: 'assets/img/cast/evelyng.jpg', width: 900, height: 1200,
+        alt: 'Evelyng — Season 2 rookie cast member' } }
   ];
 
   /* Per-card tilt/tape live in cast.css (.polaroid--t0…t9 / --r0/--r1) so the

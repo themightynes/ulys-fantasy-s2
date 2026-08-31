@@ -1,7 +1,7 @@
 /* ==========================================================================
    ULY'S FANTASY S2 — trading-card.js
    Renders the approved "Hottie Trading Card" comp on an offscreen canvas so
-   the confirmation takeover and the Big Board can hand out a real PNG.
+   the confirmation takeover and the Hottie Board can hand out a real PNG.
 
    window.UFTradingCard.generate(data, opts) → Promise<Blob> (image/png)
 

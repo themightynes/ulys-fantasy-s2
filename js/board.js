@@ -1,6 +1,6 @@
 /* ==========================================================================
    ULY'S FANTASY S2 — board.js
-   Renders the Hottie Big Board grid from UFStore (seeds + approved fans),
+   Renders the Hottie Board grid from UFStore (seeds + approved fans),
    drives the compact header countdown, and live-updates on storage events.
    All user-sourced strings are set via textContent — never innerHTML.
    ========================================================================== */

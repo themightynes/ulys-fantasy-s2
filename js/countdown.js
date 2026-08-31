@@ -16,7 +16,7 @@
   'use strict';
 
   // String form without timezone offset parses as LOCAL time — intentional.
-  var DRAFT_TS = new Date('2026-09-07T12:00:00').getTime();
+  var DRAFT_TS = new Date('2026-09-08T01:00:00Z').getTime();
   var CLOSE_TS = new Date('2026-09-06T23:59:59').getTime();
 
   function pad(n) {

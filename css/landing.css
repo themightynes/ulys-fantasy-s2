@@ -220,3 +220,19 @@
 @media (max-width: 560px) {
   .hero__ctas--under-photo { grid-template-columns: 1fr; }
 }
+
+/* Quiet lore entry point under the hero CTAs */
+.hero__cast-link {
+  display: block;
+  margin-top: 18px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: none;
+  padding: 6px 0;
+}
+.hero__cast-link:hover { color: var(--cyan); }
+.hero__cast-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }

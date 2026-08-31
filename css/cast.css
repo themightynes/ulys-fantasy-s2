@@ -1,0 +1,528 @@
+/* ==========================================================================
+   ULY'S FANTASY S2 — cast.css
+   Season 1 Cast page. Requires tokens.css + base.css loaded first.
+   Layout values transcribed from references/cast-design.dc.html.
+   Paper-ink colors (#2A0A1E, #9E1F60, #4A1132, #7A2154, #6E74A8, #0B2A31,
+   #1E7A8C, #123B45, #062A31, #E32279) have no tokens — they exist only on
+   the light scrapbook papers and are transcribed verbatim from the reference,
+   same convention board.css used for #6E74A8. (#9E1F60 darkens the
+   reference's #B0286E label pink to clear 4.5:1 on the #FFC7E4 paper.)
+ ========================================================================== */
+
+/* ---- Page shell (same content-box budget trick as board-wrap) ---- */
+.cast-wrap {
+  max-width: calc(var(--max-board) + 80px);
+  margin: 0 auto;
+  padding-left: clamp(16px, 3vw, 40px);
+  padding-right: clamp(16px, 3vw, 40px);
+}
+
+/* ==========================================================================
+   STICKY HEADER — broadcast chrome band (mirrors board.html)
+   ========================================================================== */
+.cast-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--navy-deep);
+  border-bottom: 2px solid var(--cyan);
+}
+.cast-header__inner {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.cast-header__logo-link {
+  display: inline-flex;
+  align-items: center;
+}
+.cast-header__logo {
+  height: 30px;
+  width: auto;
+}
+.cast-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   MAG COVER TITLE
+   ========================================================================== */
+.cast-hero {
+  position: relative;
+  overflow: hidden; /* clips the decorative glow only — content never overflows */
+  border-bottom: 1px solid var(--line);
+}
+.cast-hero__glow {
+  position: absolute;
+  top: -120px;
+  left: -60px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 62, 165, 0.22), transparent 70%);
+  pointer-events: none;
+}
+.cast-hero__inner {
+  position: relative;
+  padding-top: clamp(40px, 6vw, 72px);
+  padding-bottom: clamp(40px, 6vw, 72px);
+}
+.cast-hero__kicker {
+  font-size: var(--fs-label);
+  letter-spacing: 0.26em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  /* keep the kicker clear of the foil star at every width */
+  padding-right: 72px;
+}
+.cast-hero__title {
+  font-size: clamp(52px, 9vw, 120px);
+}
+.cast-hero__title-accent {
+  color: var(--pink);
+  text-shadow: var(--shadow-display);
+}
+.cast-hero__sub {
+  font-size: clamp(18px, 2.4vw, 26px);
+  line-height: 1.4;
+  margin-top: 22px;
+  max-width: 760px;
+}
+.cast-hero__star {
+  position: absolute;
+  right: clamp(16px, 4vw, 60px);
+  top: clamp(24px, 4vw, 48px);
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(140deg, #F6F8FC, #98A3BB, #EDF1F8);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  transform: rotate(12deg);
+}
+
+/* ==========================================================================
+   PLACEMENTS LADDER
+   ========================================================================== */
+.ladder {
+  background: var(--navy-deep);
+  border-bottom: 1px solid var(--line);
+}
+.ladder__inner {
+  padding-top: clamp(28px, 4vw, 44px);
+  padding-bottom: clamp(28px, 4vw, 44px);
+}
+.ladder__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.ladder__h2 {
+  font-size: clamp(26px, 3.5vw, 36px);
+}
+.ladder__hint {
+  font-size: var(--fs-label);
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.ladder__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+}
+.ladder__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--tap-min);
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.ladder__row:hover { border-color: var(--cyan); color: var(--text); }
+/* gold ONLY on Priscilla's champ row */
+.ladder__row--gold {
+  background: rgba(255, 216, 77, 0.12);
+  border-color: var(--line-gold);
+}
+.ladder__row--gold:hover { border-color: var(--gold); }
+.ladder__place {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--pink);
+  min-width: 1.4em;
+}
+.ladder__place--gold { color: var(--gold); }
+.ladder__who { flex: 1; min-width: 0; }
+.ladder__name {
+  display: block;
+  font-size: 24px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ladder__note {
+  display: block;
+  font-size: var(--fs-label-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.ladder__note--gold { color: var(--gold); }
+.ladder__note--cyan { color: var(--cyan); }
+
+/* ==========================================================================
+   CAST SPREAD — scrapbook polaroids
+   ========================================================================== */
+.cast-main {
+  padding-top: clamp(24px, 4vw, 48px);
+  padding-bottom: 80px;
+}
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+  gap: clamp(20px, 3vw, 32px);
+  /* headroom for the first row's tape / stickers (top:-22px max) */
+  padding-top: 24px;
+}
+
+.polaroid {
+  position: relative;
+  transform: rotate(var(--tilt, 0deg));
+  /* Anchor jumps must clear the sticky header PLUS tape/sticker headroom
+     (stickers reach -22px above the card). --header-h is kept in sync with
+     the real header height by js/cast.js (load / resize / fonts.ready), so
+     this can never drift when the header wraps to two rows on mobile. */
+  scroll-margin-top: calc(var(--header-h, 100px) + 40px);
+}
+/* a hovered (scaled) card must paint above its siblings' stickers */
+.polaroid:hover { z-index: 5; }
+@media (prefers-reduced-motion: no-preference) {
+  .polaroid { transition: transform 0.2s var(--ease); }
+  .polaroid:hover { transform: rotate(0deg) scale(1.02); }
+}
+/* Per-card scrapbook geometry, verbatim from the reference arrays.
+   Classes (not inline styles) so the 359px media reset below can win. */
+.polaroid--t0 { --tilt: -1.6deg; --tape: -3deg; }
+.polaroid--t1 { --tilt: 1.2deg;  --tape: 2deg; }
+.polaroid--t2 { --tilt: -0.8deg; --tape: -2deg; }
+.polaroid--t3 { --tilt: 1.8deg;  --tape: 4deg; }
+.polaroid--t4 { --tilt: -1.2deg; --tape: 3deg; }
+.polaroid--t5 { --tilt: 0.9deg;  --tape: -4deg; }
+.polaroid--t6 { --tilt: -1.8deg; --tape: 2deg; }
+.polaroid--t7 { --tilt: 1.4deg;  --tape: -2deg; }
+.polaroid--t8 { --tilt: -1deg;   --tape: 3deg; }
+.polaroid--t9 { --tilt: 1.6deg;  --tape: -3deg; }
+.polaroid--r0 { --tilt: -1.2deg; --tape: 3deg; }
+.polaroid--r1 { --tilt: 1.4deg;  --tape: -3deg; }
+.polaroid__paper {
+  color: #2A0A1E;
+  padding: 18px 18px 22px;
+  clip-path: polygon(0 1.5%, 2.5% 0, 98% 0.8%, 100% 3%, 99.2% 97%, 100% 99%, 97% 100%, 1.5% 99.2%, 0 97.5%);
+  box-shadow: 4px 6px 16px rgba(0, 0, 0, 0.35);
+}
+/* paper color cycle from the reference */
+.polaroid--paper-a .polaroid__paper { background: #FFC7E4; }
+.polaroid--paper-b .polaroid__paper { background: #F4F2F7; }
+.polaroid--paper-c .polaroid__paper { background: #FFD9EC; }
+.polaroid--paper-d .polaroid__paper { background: #EDE9F7; }
+
+.polaroid__tape {
+  position: absolute;
+  z-index: 4;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(var(--tape, 0deg));
+  width: 110px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+}
+.polaroid__photo {
+  aspect-ratio: 3 / 4;
+  background: #fff;
+  padding: 10px 10px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.polaroid__photo-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  /* head-and-shoulders silhouette placeholder, verbatim from the reference */
+  background:
+    radial-gradient(ellipse 42% 30% at 50% 30%, #2A3168 0 99%, transparent 100%),
+    radial-gradient(ellipse 75% 45% at 50% 92%, #2A3168 0 99%, transparent 100%),
+    var(--card-alt);
+}
+.polaroid__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+/* Corryn's Mom gag: her blank slot claims to be Gwyneth (client decision) */
+.polaroid__slot-name {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 12px 18px;
+  font-size: clamp(30px, 3vw, 40px);
+  letter-spacing: 0.08em;
+  color: #EDF1F8;
+  text-shadow: 0 2px 10px rgba(6, 9, 36, 0.55);
+}
+.polaroid__pending {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: #6E74A8;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.polaroid__body { margin-top: 16px; }
+.polaroid__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.polaroid__name {
+  font-size: 28px;
+  line-height: 1;
+}
+/* gold ONLY on Priscilla's champ badge */
+.polaroid__champ {
+  background: var(--grad-gold-tag);
+  color: var(--gold-ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  padding: 4px 9px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.polaroid__label {
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #9E1F60;
+  margin-top: 5px;
+}
+.polaroid__bio {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.4;
+  margin-top: 12px;
+  color: #4A1132;
+}
+.polaroid__stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(42, 10, 30, 0.35);
+}
+.polaroid__stat-label {
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7A2154;
+}
+.polaroid__stat-num {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: #2A0A1E;
+  white-space: nowrap;
+}
+
+/* ---- Stickers (scrapbook, editorial surfaces only, one per card) ---- */
+.polaroid__sticker {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+}
+.sticker { display: block; }
+.sticker--heart {
+  width: 52px;
+  height: 48px;
+  position: relative;
+  transform: rotate(-10deg);
+  filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.3));
+}
+.sticker--heart::before,
+.sticker--heart::after {
+  content: "";
+  position: absolute;
+  width: 27px;
+  height: 42px;
+  background: #E32279;
+}
+.sticker--heart::before {
+  left: 4px;
+  border-radius: 40px 40px 0 40px;
+  transform: rotate(-45deg);
+}
+.sticker--heart::after {
+  right: 4px;
+  border-radius: 40px 40px 40px 0;
+  transform: rotate(45deg);
+}
+.sticker--star {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(140deg, #F6F8FC, #98A3BB, #EDF1F8);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  transform: rotate(12deg);
+  filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.3));
+}
+.sticker--xoxo {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.1em;
+  background: linear-gradient(120deg, var(--cyan), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform: rotate(-6deg);
+  filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.4));
+}
+.sticker--badge {
+  background: var(--navy);
+  color: var(--pink);
+  font-size: var(--fs-label-sm);
+  letter-spacing: 0.14em;
+  padding: 7px 12px;
+  transform: rotate(5deg);
+  border-radius: 30px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   NEW FOR SEASON 2 — rookies
+   ========================================================================== */
+.rookies { margin-top: 64px; }
+.rookies__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.rookies__h2 {
+  font-size: clamp(26px, 3.5vw, 36px);
+  color: var(--cyan);
+}
+.rookies__rule {
+  flex: 1;
+  border-top: 1px dashed rgba(67, 232, 255, 0.4);
+}
+.rookies .cast-grid { padding-top: 16px; } /* tape headroom, no stickers here */
+.polaroid--rookie .polaroid__paper { background: #EDF6F8; color: #0B2A31; }
+.polaroid--rookie .polaroid__label { color: #1E7A8C; }
+.polaroid--rookie .polaroid__bio { color: #123B45; }
+.polaroid__rookie-badge {
+  background: var(--cyan);
+  color: #062A31;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  padding: 4px 9px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   CTA
+   ========================================================================== */
+.cast-cta {
+  margin-top: 64px;
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  padding: clamp(32px, 5vw, 48px) 24px;
+}
+.cast-cta__lead {
+  font-size: clamp(18px, 2.4vw, 24px);
+}
+.cast-cta .btn {
+  margin-top: 18px;
+  font-size: clamp(24px, 3vw, 28px);
+  padding: 16px 34px;
+  white-space: normal;
+  line-height: 1.3;
+}
+.cast-cta__dates {
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label);
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+/* ==========================================================================
+   FOOTER (mirrors board-footer)
+   ========================================================================== */
+.cast-footer {
+  max-width: calc(var(--max-board) + 80px);
+  margin: 0 auto;
+  padding: 22px clamp(16px, 3vw, 40px);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: var(--fs-label-sm);
+  letter-spacing: var(--ls-label);
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.cast-footer__xoxo { color: var(--pink); }
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 640px) {
+  .cast-header__inner { gap: 10px 14px; padding-top: 12px; padding-bottom: 12px; }
+}
+@media (max-width: 480px) {
+  /* smaller foil star tucked tighter so the kicker never fights it */
+  .cast-hero__star { width: 44px; height: 44px; top: 14px; right: 12px; }
+  .cast-hero__kicker { padding-right: 56px; }
+}
+@media (max-width: 359px) {
+  .cast-header__logo { height: 26px; }
+  /* narrowest viewports: ease the tilt so rotated corners stay well inside
+     the 16px gutters (fix the geometry, don't hide the overflow) */
+  .polaroid { --tilt: 0deg; }
+  .cast-cta .btn { font-size: 20px; padding: 14px 20px; }
+}

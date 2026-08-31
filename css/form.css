@@ -1,0 +1,398 @@
+/* ==========================================================================
+   ULY'S FANTASY S2 — form.css (landing-form)
+   Scouting form + confirmation takeover + scouting-closed state.
+   Section geometry (.form-section) is owned by landing.css; this file owns
+   everything inside <section id="form">.
+   Requires tokens.css + base.css loaded first.
+   ========================================================================== */
+
+/* ---- Section heading --------------------------------------------------- */
+.scout__kicker { margin-bottom: 10px; }
+
+.scout__title {
+  font-size: var(--fs-h2);
+  margin: 0 0 32px;
+}
+
+/* ---- Form layout ------------------------------------------------------- */
+.scout[hidden] { display: none; }
+
+.scout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.scout__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scout__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.scout__label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.scout__label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scout__req { color: var(--pink); }
+.scout__opt { color: var(--muted); }
+
+/* ---- Inputs: clean broadcast chrome, no decoration --------------------- */
+.scout__input {
+  width: 100%;
+  min-height: var(--tap-min);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  padding: 14px 16px;
+  border-radius: 0;
+  transition: border-color var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
+}
+
+.scout__input::placeholder { color: var(--muted); opacity: 1; }
+
+/* Focus glow — pink border, keyboard users additionally get the cyan ring */
+.scout__input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 1px var(--pink), 0 0 14px rgba(255, 62, 165, 0.35);
+}
+
+.scout__select {
+  appearance: auto;
+  padding: 14px 12px;
+}
+.scout__select option { background: var(--card); color: var(--text); }
+
+.scout__textarea {
+  resize: vertical;
+  min-height: 128px;
+}
+
+/* ---- Live character counter -------------------------------------------- */
+.scout__counter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.scout__counter--hot { color: var(--pink); }
+
+.scout__onair {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ---- Consent ------------------------------------------------------------ */
+.scout__consent {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  cursor: pointer;
+  background: var(--card);
+  border: 1px dashed rgba(255, 199, 228, 0.4);
+  padding: 16px;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.scout__consent:hover { border-color: rgba(255, 199, 228, 0.7); }
+
+.scout__checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--pink);
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.scout__consent-text {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #C9CCE4;
+}
+
+/* ---- Submit ------------------------------------------------------------- */
+.scout__submit {
+  border: none;
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: var(--ls-display);
+  padding: 18px;
+  text-transform: uppercase;
+  min-height: 60px;
+  background: var(--pink);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+.scout__submit:hover { background: var(--pink-deep); }
+.scout__submit:active { transform: translateY(2px); }
+
+/* Invalid → visually disabled (still focusable/clickable so the error
+   region can announce what is missing). */
+.scout__submit[aria-disabled="true"] {
+  background: #3A3F6B;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.scout__submit[aria-disabled="true"]:hover { background: #3A3F6B; }
+.scout__submit[aria-disabled="true"]:active { transform: none; }
+
+/* ---- Error region (always in the DOM for reliable aria-live) ----------- */
+.scout__error {
+  color: var(--pink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  min-height: 1.5em; /* space reserved even when empty — no shift on announce */
+  margin-top: -8px;
+}
+
+/* ==========================================================================
+   SCOUTING CLOSED
+   ========================================================================== */
+.closed { text-align: center; }
+
+.closed__kicker { margin-bottom: 12px; }
+
+.closed__title {
+  font-size: var(--fs-h2);
+  color: var(--pink);
+  text-shadow: var(--shadow-display);
+  margin: 0 0 18px;
+}
+
+.closed__line {
+  font-size: clamp(17px, 2.2vw, 20px);
+  margin: 0 auto 28px;
+  max-width: 520px;
+}
+
+.closed__dates {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.closed__cta { font-size: 20px; }
+
+/* ==========================================================================
+   CONFIRMATION TAKEOVER — full pink, focus-trapped
+   ========================================================================== */
+.takeover {
+  position: fixed;
+  inset: 0;
+  background: var(--pink);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
+  opacity: 1;
+  transition: opacity var(--dur-med) var(--ease);
+}
+
+.takeover[hidden] { display: none; }
+
+.takeover__card {
+  max-width: 680px;
+  text-align: center;
+  margin: auto; /* keeps it scrollable & centered on short viewports */
+  transform: scale(1);
+  transition: transform var(--dur-med) var(--ease);
+}
+
+/* Entrance: .takeover--enter is applied for one frame, then removed */
+.takeover--enter { opacity: 0; }
+.takeover--enter .takeover__card { transform: scale(0.96); }
+
+.takeover__lockup {
+  width: min(180px, 48vw);
+  height: auto;
+  margin: 0 auto 24px;
+  transition: transform var(--dur-med) var(--ease),
+              opacity var(--dur-med) var(--ease);
+}
+
+.takeover__kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  /* white on navy chip = 18.8:1 (white directly on pink was 3.24:1) */
+  color: #fff;
+  background: var(--navy);
+  padding: 8px 14px 8px 18px; /* extra left balances letter-spacing tail */
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.takeover__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(44px, 8vw, 88px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: var(--shadow-display-navy);
+  margin: 0;
+}
+
+.takeover__line {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: clamp(18px, 3vw, 24px);
+  color: #3A0B26;
+  margin-top: 22px;
+  line-height: 1.35;
+}
+
+.takeover__actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 36px;
+}
+
+.takeover__share,
+.takeover__board {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: var(--ls-display);
+  padding: 16px 28px;
+  text-transform: uppercase;
+  min-height: 56px;
+  border: none;
+  border-radius: 0;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+
+.takeover__share { background: var(--navy); color: #fff; }
+.takeover__share:hover { background: var(--navy-deep); }
+.takeover__share:active { transform: translateY(2px); }
+
+.takeover__board { background: #fff; color: var(--pink); }
+.takeover__board:hover { background: var(--navy); color: #fff; }
+.takeover__board:active { transform: translateY(2px); }
+
+.takeover__again {
+  background: none;
+  border: none;
+  color: var(--navy); /* #0A0E2E on #FF3EA5 = 5.81:1 (plum #5C0B37 was 4.16:1) */
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-top: 32px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: var(--tap-min);
+  padding: 8px 12px;
+  transition: text-decoration-thickness var(--dur-fast) var(--ease);
+}
+/* hover keeps the 5.81:1 navy; the underline thickens instead of recoloring */
+.takeover__again:hover { text-decoration-thickness: 2.5px; }
+
+/* Focus on pink field: cyan ring reads fine, add offset contrast */
+.takeover :focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Wink graphic variant on the confirmation takeover (SPEC: ~200–260px) */
+.takeover__lockup--wink {
+  width: min(232px, 56vw);
+  border: none;
+  outline: 3px solid var(--navy);
+  outline-offset: -1px;
+  background: var(--navy);
+  box-shadow: 8px 8px 0 var(--navy);
+  transform: rotate(-3deg) translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Subtle lockup entrance, riding the same one-frame --enter mechanism */
+.takeover--enter .takeover__lockup--wink {
+  opacity: 0;
+  transform: rotate(-6deg) scale(0.9);
+}
+
+/* ---- Reduced motion (last, so its overrides win the ties) --------------- */
+@media (prefers-reduced-motion: reduce) {
+  .takeover,
+  .takeover__card,
+  .takeover__lockup {
+    transition: none !important;
+  }
+  .takeover--enter { opacity: 1; }
+  .takeover--enter .takeover__card { transform: none; }
+  .takeover--enter .takeover__lockup--wink {
+    opacity: 1;
+    transform: rotate(-3deg);
+  }
+}
+
+/* Checkmark sized to the cap-height so descending lines never overlap it */
+.takeover__check {
+  font-size: 0.62em;
+  display: inline-block;
+  vertical-align: baseline;
+  transform: translateY(-0.06em);
+  text-shadow: none;
+  margin-right: 0.06em;
+}
+
+/* Asset 5 lock-up above the form kicker */
+.scout__lockup {
+  display: block;
+  width: min(200px, 44vw);
+  height: auto;
+  margin: 0 0 18px;
+}
+
+/* Honeypot field: offscreen (not display:none — bots skip hidden inputs),
+   unreachable by keyboard (tabindex=-1) and screen readers (aria-hidden) */
+.scout__hp {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

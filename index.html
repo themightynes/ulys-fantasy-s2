@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SUBMIT A HOTTIE — Uly's Fantasy S2</title>
+  <meta name="description" content="Help Uly build his dream FANTASY. Submit a hottie! File your Current Hottie with Besties HQ before Sun Sep 6 — draft day is Labor Day, Mon Sep 7.">
+  <meta property="og:title" content="SUBMIT A HOTTIE — Uly's Fantasy S2">
+  <meta property="og:description" content="Help Uly build his dream FANTASY. Submit a hottie! Draft day Mon Sep 7 — scouting closes Sun Sep 6, 11:59 PM.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://hotties.ulyandernesto.com/assets/img/opt/landing-preview-og.jpg">
+  <meta property="og:url" content="https://hotties.ulyandernesto.com/index.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SUBMIT A HOTTIE — Uly's Fantasy S2">
+  <meta name="twitter:description" content="Help Uly build his dream FANTASY. Submit a hottie! Draft day Mon Sep 7 — scouting closes Sun Sep 6, 11:59 PM.">
+  <meta name="twitter:image" content="https://hotties.ulyandernesto.com/assets/img/opt/landing-preview-og.jpg">
+  <link rel="icon" type="image/svg+xml" href="assets/logo/star.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <div class="ticker__group">
+        <span class="ticker__item">★ ULY'S FANTASY S2</span><span class="ticker__item">★ SCOUTING IS OPEN</span><span class="ticker__item">★ DRAFT DAY MON SEP 7</span><span class="ticker__item">★ SUBMIT A HOTTIE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero__copy">
+      <img class="hero__lockup" src="assets/logo/Asset%205.svg" alt="Uly's Fantasy — Season 2" width="740" height="382">
+      <p class="badge-live hero__badge"><span class="badge-live__dot" aria-hidden="true"></span>Season 2 · Scouting live</p>
+      <h1 class="display display--tight display--shadow hero__title">Submit a Hottie</h1>
+      <p class="editorial hero__subline">Help Uly build his dream FANTASY. Submit a hottie!</p>
+    </div>
+    <div class="hero__right">
+    <figure class="hero__media">
+      <div class="hero__frame" aria-hidden="true"></div>
+      <div class="hero__photo">
+        <img src="assets/img/opt/hero-900.jpg"
+             srcset="assets/img/opt/hero-480.jpg 480w, assets/img/opt/hero-900.jpg 900w"
+             sizes="(max-width: 767px) calc(100vw - 40px), 400px"
+             width="900" height="1200"
+             loading="eager" fetchpriority="high" decoding="async"
+             alt="Uly, the Head Hottie — deadpan media-day portrait, jersey on, staring down the camera.">
+      </div>
+      <figcaption class="lower-third hero__lower-third">
+        <div class="lower-third__name">Uly · Head Hottie</div>
+        <div class="lower-third__meta">Besties HQ · Season 2</div>
+      </figcaption>
+    </figure>
+    <div class="hero__ctas hero__ctas--under-photo">
+      <a class="btn btn--pink" href="#form">Scout him now ↓</a>
+      <a class="btn btn--outline" href="board.html">The Hottie Board</a>
+    </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- COUNTDOWN -->
+    <section class="cd-band" aria-labelledby="cd-heading">
+      <div class="cd-band__inner">
+        <div class="cd-band__clock">
+          <h2 id="cd-heading" class="label label--wide cd-band__label">Countdown to Draft Day</h2>
+          <div class="cd" id="countdown" role="timer" aria-label="Counting down to draft day">
+            <div class="cd__unit" aria-hidden="true"><div class="cd__num" id="cd-days">--</div><div class="cd__label">DAYS</div></div>
+            <div class="cd__unit" aria-hidden="true"><div class="cd__num" id="cd-hrs">--</div><div class="cd__label">HRS</div></div>
+            <div class="cd__unit" aria-hidden="true"><div class="cd__num" id="cd-min">--</div><div class="cd__label">MIN</div></div>
+            <div class="cd__unit" aria-hidden="true"><div class="cd__num cd__num--pink" id="cd-sec">--</div><div class="cd__label">SEC</div></div>
+          </div>
+        </div>
+        <div class="cd-band__dates">
+          <div class="date-badge date-badge--gold">
+            <span class="date-badge__tag">Draft Day</span>
+            <span class="date-badge__when">Monday, Sep 7 — Labor Day</span>
+          </div>
+          <div class="date-badge date-badge--pink">
+            <span class="date-badge__tag">Scouting closes</span>
+            <span class="date-badge__when">Sunday, Sep 6 · 11:59 PM</span>
+          </div>
+          <p class="editorial cd-band__warning">No hottie left behind, hopefully. Submit before Sunday night.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <section id="form" class="form-section">
+      <link rel="stylesheet" href="css/form.css">
+
+      <p class="label label--wide label--cyan scout__kicker">Official scouting report</p>
+      <h2 class="display scout__title">File your Current Hottie</h2>
+
+      <form id="scout-form" class="scout" novalidate>
+        <div class="scout__field">
+          <label class="scout__label" for="f-name">Player name <span class="scout__req" aria-hidden="true">*</span></label>
+          <input class="scout__input" id="f-name" name="name" type="text" autocomplete="off" required placeholder="Full name or alias">
+        </div>
+
+        <div class="scout__field">
+          <label class="scout__label" for="f-team">Team <span class="scout__req" aria-hidden="true">*</span></label>
+          <select class="scout__input scout__select" id="f-team" name="team" required>
+            <option value="">— pick his team —</option>
+            <option>Cardinals</option>
+            <option>Falcons</option>
+            <option>Ravens</option>
+            <option>Bills</option>
+            <option>Panthers</option>
+            <option>Bears</option>
+            <option>Bengals</option>
+            <option>Browns</option>
+            <option>Cowboys</option>
+            <option>Broncos</option>
+            <option>Lions</option>
+            <option>Packers</option>
+            <option>Texans</option>
+            <option>Colts</option>
+            <option>Jaguars</option>
+            <option>Chiefs</option>
+            <option>Raiders</option>
+            <option>Chargers</option>
+            <option>Rams</option>
+            <option>Dolphins</option>
+            <option>Vikings</option>
+            <option>Patriots</option>
+            <option>Saints</option>
+            <option>Giants</option>
+            <option>Jets</option>
+            <option>Eagles</option>
+            <option>Steelers</option>
+            <option>49ers</option>
+            <option>Seahawks</option>
+            <option>Buccaneers</option>
+            <option>Titans</option>
+            <option>Commanders</option>
+            <option>Idk he's just hot</option>
+          </select>
+        </div>
+
+        <div class="scout__field">
+          <div class="scout__label-row">
+            <label class="scout__label" for="f-why">Why is he a hottie? <span class="scout__req" aria-hidden="true">*</span></label>
+            <span class="scout__counter" id="f-why-count" aria-hidden="true">0/280</span>
+          </div>
+          <textarea class="scout__input scout__textarea" id="f-why" name="why" rows="4" maxlength="280" required placeholder="Make your case, scout." aria-describedby="f-why-note f-why-limit"></textarea>
+          <span class="visually-hidden" id="f-why-limit">Maximum 280 characters.</span>
+          <span class="visually-hidden" id="f-why-sr" aria-live="polite"></span>
+          <p class="scout__onair editorial" id="f-why-note">Maybe your reason will make it to the video!</p>
+        </div>
+
+        <div class="scout__grid">
+          <div class="scout__field">
+            <label class="scout__label" for="f-pos">Position <span class="scout__opt">(optional)</span></label>
+            <select class="scout__input scout__select" id="f-pos" name="pos">
+              <option value="">— scout's discretion —</option>
+              <option>Quarterback</option>
+              <option>Running Back</option>
+              <option>Wide Receiver</option>
+              <option>Tight End 😏</option>
+              <option>Top</option>
+              <option>Bottom</option>
+              <option>Offensive Line (built)</option>
+              <option>Free Agent</option>
+              <option>Franchise Player</option>
+            </select>
+          </div>
+          <div class="scout__field">
+            <label class="scout__label" for="f-photo">Photo link <span class="scout__opt">(optional)</span></label>
+            <input class="scout__input" id="f-photo" name="photo" type="url" autocomplete="off" placeholder="https://…">
+          </div>
+        </div>
+
+        <div class="scout__field">
+          <label class="scout__label" for="f-ig">Your IG handle <span class="scout__opt">(optional — for credit)</span></label>
+          <input class="scout__input" id="f-ig" name="ig" type="text" autocomplete="off" placeholder="@yourhandle">
+        </div>
+
+        <!-- Honeypot: humans never see this; bots that fill it are dropped server-side -->
+        <div class="scout__hp" aria-hidden="true">
+          <label for="f-hp">Leave this field empty</label>
+          <input id="f-hp" name="hp" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label class="scout__consent">
+          <input class="scout__checkbox" id="f-consent" name="consent" type="checkbox" required>
+          <span class="scout__consent-text">I understand my scouting report may appear on the live Hottie Board and could lead to eventual marriage with Uly. Once submitted he becomes Uly's, not yours. <span class="scout__req" aria-hidden="true">*</span></span>
+        </label>
+
+        <button class="scout__submit" id="f-submit" type="submit" aria-disabled="true">Submit to Besties HQ</button>
+        <div class="scout__error" id="f-error" role="alert" aria-live="assertive"></div>
+      </form>
+
+      <!-- SCOUTING CLOSED (shown past Sep 6 23:59 or ?preview=closed) -->
+      <div class="closed" id="scout-closed" hidden>
+        <p class="label label--wide closed__kicker">Official Besties HQ notice</p>
+        <h2 class="display closed__title">Scouting is closed</h2>
+        <p class="closed__line editorial">Besties HQ is sequestered. No hottie left behind — every filed prospect gets his grade.</p>
+        <div class="closed__dates">
+          <div class="date-badge date-badge--pink">
+            <span class="date-badge__tag">Scouting closed</span>
+            <span class="date-badge__when">Sunday, Sep 6 · 11:59 PM</span>
+          </div>
+          <div class="date-badge date-badge--gold">
+            <span class="date-badge__tag">Draft Day</span>
+            <span class="date-badge__when">Monday, Sep 7 — Labor Day</span>
+          </div>
+        </div>
+        <a class="btn btn--pink closed__cta" href="board.html">See the board →</a>
+      </div>
+
+      <!-- CONFIRMATION TAKEOVER -->
+      <div class="takeover" id="takeover" role="dialog" aria-modal="true" aria-labelledby="takeover-title" hidden>
+        <div class="takeover__card">
+          <img class="takeover__lockup takeover__lockup--wink" src="assets/img/opt/portrait-logo-og.jpg" alt="Uly winking under the Uly's Fantasy wordmark" width="1200" height="1200">
+          <p class="takeover__kicker">Official Besties HQ notice</p>
+          <h2 class="takeover__title" id="takeover-title"><span class="takeover__check">✅</span> Your Current Hottie has been scouted.</h2>
+          <p class="takeover__line" id="takeover-line">Your prospect has been filed with Besties HQ. Grades drop on draft day.</p>
+          <div class="takeover__actions">
+            <button class="takeover__share" id="takeover-share" type="button">Share to story</button>
+            <a class="takeover__board" id="takeover-board" href="board.html">View the board →</a>
+          </div>
+          <button class="takeover__again" id="takeover-again" type="button">Scout another prospect</button>
+        </div>
+      </div>
+
+      <script src="js/store.js" defer></script>
+      <script src="js/form.js" defer></script>
+    </section>
+
+    <!-- BOARD LINK -->
+    <section id="board" class="board-link" aria-labelledby="board-link-label">
+      <p id="board-link-label" class="label label--wide board-link__label">Already scouted</p>
+      <a class="display board-link__cta" href="board.html">See the live Hottie Board →</a>
+      <p class="editorial board-link__tagline">Every prospect. Every grade. Updated as Besties HQ deliberates.</p>
+      <p class="board-link__tagline">New to the league? <a class="link-tap" href="cast.html">Meet the Season 1 Cast →</a></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="footer__brand">
+      <img class="footer__wordmark" src="assets/logo/Asset%201.svg" alt="Uly's Fantasy" width="570" height="99">
+      <span>· Season 2</span>
+    </span>
+    <span class="footer__xoxo">XOXO, Besties HQ</span>
+  </footer>
+
+  <script src="js/countdown.js"></script>
+  <script src="js/ticker.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var els = {
+        dd: document.getElementById('cd-days'),
+        hh: document.getElementById('cd-hrs'),
+        mm: document.getElementById('cd-min'),
+        ss: document.getElementById('cd-sec')
+      };
+      var timer = document.getElementById('countdown');
+      window.UFCountdown.start(function (p) {
+        if (els.dd.textContent !== p.dd) els.dd.textContent = p.dd;
+        if (els.hh.textContent !== p.hh) els.hh.textContent = p.hh;
+        if (els.mm.textContent !== p.mm) els.mm.textContent = p.mm;
+        if (els.ss.textContent !== p.ss) els.ss.textContent = p.ss;
+        timer.setAttribute('aria-label',
+          'Counting down to draft day: ' + window.UFCountdown.spoken());
+      });
+    })();
+  </script>
+</body>
+</html>

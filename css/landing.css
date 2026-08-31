@@ -1,0 +1,222 @@
+/* ==========================================================================
+   ULY'S FANTASY S2 — landing.css (landing-shell)
+   Page layout for index.html: hero, countdown band, board link, footer.
+   Components (ticker, buttons, badges, cd boxes, lower-third) come from
+   base.css — this file only owns page geometry and section chrome.
+   Requires tokens.css + base.css loaded first.
+   ========================================================================== */
+
+/* ---- HERO ------------------------------------------------------------- */
+.hero {
+  max-width: var(--max-page);
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 88px) var(--pad-page) clamp(48px, 5vw, 72px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+
+.hero__badge { margin-bottom: 24px; }
+
+.hero__title { font-size: var(--fs-hero); }
+
+.hero__subline {
+  font-size: var(--fs-editorial);
+  margin-top: 24px;
+}
+
+.hero__ctas {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+/* Portrait with cyan offset frame + lower third */
+.hero__right {
+  justify-self: center;
+  width: min(100%, 360px);
+}
+
+.hero__media {
+  margin: 0;
+  width: 100%;
+  position: relative;
+}
+
+.hero__frame {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  right: 14px;
+  bottom: 14px;
+  border: 2px solid var(--cyan);
+  z-index: 0;
+}
+
+.hero__photo {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 3 / 4;
+  background: var(--card);
+}
+
+.hero__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%; /* keep face in the upper third */
+}
+
+.hero__lower-third {
+  position: absolute;
+  bottom: 22px;
+  left: -18px;
+  z-index: 2;
+  max-width: 85%;
+}
+
+/* At the narrowest widths the -18px overhang would poke past the page edge. */
+@media (max-width: 359px) {
+  .hero__lower-third { left: -8px; }
+  .hero__frame { left: -8px; right: 8px; }
+}
+
+/* ---- COUNTDOWN BAND ---------------------------------------------------- */
+.cd-band {
+  background: var(--navy-deep);
+  border-top: 2px solid var(--cyan);
+  border-bottom: 1px solid var(--line);
+  padding: var(--pad-band) var(--pad-page);
+}
+
+.cd-band__inner {
+  max-width: var(--max-page);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cd-band__label { margin-bottom: 14px; }
+
+.cd-band__dates {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: min(260px, 100%);
+}
+
+.cd-band__warning {
+  font-size: 16px; /* .editorial supplies family / italic / bubblegum */
+}
+
+/* ---- FORM PLACEHOLDER -------------------------------------------------- */
+.form-section {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(48px, 6vw, 80px) var(--pad-page);
+  scroll-margin-top: 24px;
+}
+
+/* ---- BOARD LINK -------------------------------------------------------- */
+.board-link {
+  border-top: 1px solid var(--line);
+  background: var(--navy-deep);
+  padding: clamp(48px, 6vw, 72px) var(--pad-page);
+  text-align: center;
+  scroll-margin-top: 24px;
+}
+
+.board-link__label { margin-bottom: 14px; }
+
+.board-link__cta {
+  display: inline-block;
+  font-size: clamp(32px, 5vw, 52px);
+  color: var(--cyan);
+  text-decoration: none;
+  border-bottom: 3px solid var(--cyan);
+  padding-bottom: 4px;
+  transition: color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+.board-link__cta:hover,
+.board-link__cta:active {
+  color: var(--pink);
+  border-color: var(--pink);
+}
+
+.board-link__tagline {
+  font-size: 17px;
+  color: var(--muted); /* reference: muted, not bubblegum, on this line */
+  margin-top: 18px;
+}
+
+/* ---- FOOTER ------------------------------------------------------------ */
+.footer {
+  padding: 28px var(--pad-page);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: var(--fs-label-sm);
+  letter-spacing: var(--ls-label);
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer__wordmark {
+  width: auto;
+  height: 20px;
+}
+
+.footer__xoxo { color: var(--pink); }
+
+/* Mobile: hero CTAs stack as full-width buttons (landing-ref-390) */
+@media (max-width: 599px) {
+  .hero__ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__ctas .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Asset 5 lock-up crowning the hero (client-approved placement) */
+.hero__lockup {
+  display: block;
+  width: min(200px, 44vw);
+  height: auto;
+  margin: 0 0 32px;
+}
+
+/* CTAs under the hero portrait (client-approved): side-by-side, spanning photo width */
+.hero__ctas--under-photo {
+  margin-top: 34px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.hero__ctas--under-photo .btn {
+  width: 100%;
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .hero__ctas--under-photo { grid-template-columns: 1fr; }
+}

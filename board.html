@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>THE HOTTIE BIG BOARD — Uly's Fantasy S2</title>
+  <meta name="description" content="Round 1 of Uly's Fantasy Season 2 — the live Hottie Big Board. Uly at №1, fan picks filling the rest. Scouting closes Sun 9/6 · Draft day Mon Sep 7.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo/star.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="THE HOTTIE BIG BOARD — Uly's Fantasy S2">
+  <meta property="og:description" content="Round 1 · Official scouting. See who's on the board and submit a hottie before Sun 9/6. Draft day Mon Sep 7.">
+  <meta property="og:image" content="https://hotties.ulyandernesto.com/assets/img/opt/portrait-logo-og.jpg">
+  <meta property="og:url" content="https://hotties.ulyandernesto.com/board.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="THE HOTTIE BIG BOARD — Uly's Fantasy S2">
+  <meta name="twitter:description" content="Round 1 · Official scouting. See who's on the board and submit a hottie before Sun 9/6. Draft day Mon Sep 7.">
+  <meta name="twitter:image" content="https://hotties.ulyandernesto.com/assets/img/opt/portrait-logo-og.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/board.css">
+</head>
+<body>
+
+  <!-- STICKY HEADER -->
+  <header class="board-header">
+    <div class="board-header__inner board-wrap">
+      <div class="board-header__brand">
+        <a class="board-header__logo-link link-tap" href="index.html" aria-label="Uly's Fantasy — home">
+          <img class="board-header__logo" src="assets/logo/Asset 1.svg" alt="Uly's Fantasy" width="172" height="30">
+        </a>
+        <span class="badge-live"><span class="badge-live__dot" aria-hidden="true"></span>Live board</span>
+      </div>
+      <div class="board-header__meta">
+        <p class="board-header__cd" id="cd-wrap" role="timer" aria-label="Countdown to draft day">DRAFT IN <span id="cd-short" aria-hidden="true">--D --H --M --S</span></p>
+        <span class="board-header__closes">Scouting closes Sun 9/6</span>
+        <a class="btn btn--outline btn--sm board-header__cast" href="cast.html">Season 1 Cast</a>
+        <a class="btn btn--outline btn--sm" href="index.html">+ Submit a hottie</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- TITLE BAR -->
+  <div class="board-title">
+    <div class="board-title__inner board-wrap">
+      <h1 class="display board-title__h1">The Hottie Big Board</h1>
+      <p class="board-title__count" id="picks-filed" aria-live="polite">Round 1 · Official scouting · 1 of 12 picks filed</p>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <main class="board-main board-wrap">
+    <div class="board-grid" id="board-grid"></div>
+    <div class="board-cta">
+      <a class="btn btn--pink" href="index.html">Submit a hottie before Sun 9/6 →</a>
+    </div>
+  </main>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <div class="ticker__group">
+        <span class="ticker__item">★ YOUR CURRENT HOTTIE HAS BEEN SCOUTED</span>
+        <span class="ticker__item">★ DRAFT DAY MON SEP 7</span>
+        <span class="ticker__item">★ SCOUTING CLOSES SUN 9/6</span>
+        <span class="ticker__item">★ SUBMIT A HOTTIE</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="board-footer">
+    <span>Uly's Fantasy · Season 2 · The Big Board</span>
+    <a class="board-footer__cast link-tap" href="cast.html">Season 1 Cast →</a>
+    <span class="board-footer__xoxo">XOXO, Besties HQ</span>
+  </footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/countdown.js"></script>
+  <script src="js/ticker.js"></script>
+  <script src="js/board.js"></script>
+</body>
+</html>

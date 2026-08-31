@@ -1,0 +1,98 @@
+/* ==========================================================================
+   ULY'S FANTASY S2 — Design tokens (source of truth)
+   Every color / font / spacing token from SPEC.md. Do not hardcode values
+   elsewhere — consume these custom properties.
+   ========================================================================== */
+
+:root {
+  /* ---- Color: field ---- */
+  --navy:        #0A0E2E;  /* base field */
+  --navy-deep:   #060924;  /* header/footer chrome bands */
+  --card:        #0E1340;  /* card / input surfaces */
+  --card-alt:    #141A4C;  /* alt card surface */
+  --card-alt-2:  #1A2058;  /* alt card surface 2 */
+
+  /* ---- Color: voice ---- */
+  --pink:        #FF3EA5;  /* shouts, CTAs */
+  --pink-deep:   #C42880;  /* pink hover / gradient end */
+  --bubblegum:   #FFC7E4;  /* editorial text/surfaces ONLY */
+  --cyan:        #43E8FF;  /* data, live states, focus */
+  --gold:        #FFD84D;  /* №1 / Uly / reward ONLY */
+
+  /* ---- Color: text ---- */
+  --text:        #F4F2F7;
+  --muted:       #8B8FB5;
+  --faint:       #565B85;  /* NON-TEXT only (2.9:1 on navy): borders/decorative */
+
+  /* ---- Gradients ---- */
+  --grad-gold:   linear-gradient(180deg, #FFF3C4 0%, #FFD84D 55%, #B8860B 100%);
+  --grad-gold-tag: linear-gradient(140deg, #FFF3C4, #FFD84D);
+  --grad-pink:   linear-gradient(90deg, #FF3EA5, #C42880);
+
+  /* ---- Derived chrome (borders / lines on navy) ---- */
+  --line:        rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --line-btn:    rgba(255, 255, 255, 0.3);   /* outline CTA (landing hero) */
+  --line-btn-strong: rgba(255, 255, 255, 0.35); /* board-header small button only */
+  --line-card:   rgba(255, 255, 255, 0.14);
+  --line-cyan:   rgba(67, 232, 255, 0.35);
+  --line-gold:   rgba(255, 216, 77, 0.55);
+  --gold-ink:    #3A2B00;  /* text on gold */
+
+  /* ---- Type families ---- */
+  --font-display: 'Anton', 'Arial Narrow', sans-serif;      /* ALWAYS uppercase */
+  --font-editorial: 'Instrument Serif', Georgia, serif;     /* italic, gossip */
+  --font-mono: 'Space Mono', 'Courier New', monospace;      /* UI / data / labels */
+
+  /* ---- Type scale ---- */
+  --fs-hero:      clamp(64px, 10vw, 132px);
+  --fs-h1:        clamp(30px, 5vw, 48px);
+  --fs-h2:        clamp(36px, 5vw, 54px);
+  --fs-card-name: 26px;
+  --fs-cd-digit:  clamp(44px, 6vw, 72px);
+  --fs-body:      16px;
+  --fs-editorial: clamp(20px, 2.4vw, 28px);
+  --fs-label:     11px;
+  --fs-label-sm:  10px;
+  --fs-ticker:    15px;
+
+  /* ---- Display line-heights ---- */
+  --lh-display-tight: 0.92;
+  --lh-display: 1.05;
+
+  /* ---- Letterspacing (mono labels & display) ---- */
+  --ls-label:     0.18em;
+  --ls-label-wide: 0.24em;
+  --ls-display:   0.08em;
+  --ls-ticker:    0.12em;
+
+  /* ---- Spacing scale ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 72px;
+  --pad-page: clamp(20px, 4vw, 48px);
+  --pad-band: clamp(36px, 5vw, 56px);
+  --max-page: 1200px;
+  --max-board: 1360px;
+
+  /* ---- Motion ---- */
+  --dur-fast: 150ms;
+  --dur-med: 250ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ticker-speed: 20s;
+
+  /* ---- Effects ---- */
+  --shadow-display: 4px 4px 0 var(--cyan);   /* Anton cyan offset shadow */
+  --shadow-display-navy: 4px 4px 0 var(--navy);
+  --glow-pink: 0 0 14px var(--pink);
+  --focus-ring: 2px solid var(--cyan);
+  --focus-offset: 2px;
+
+  /* ---- Touch ---- */
+  --tap-min: 44px;
+}

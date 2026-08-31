@@ -203,14 +203,21 @@
       /* safePhotoUrl keeps the local adapter's '[uploaded photo]' marker out;
          a real cross-origin URL is attempted and silently dropped by
          UFTradingCard if it would taint the canvas. */
-      window.UFTradingCard.generate({
+      var photoUrl = safePhotoUrl(pick.photo) || '';
+      var isDrive = /^https:\/\/drive\.google\.com\//.test(photoUrl);
+      var photoReady = (isDrive && pick.id && window.UFStore &&
+          typeof window.UFStore.getPhotoData === 'function')
+        ? window.UFStore.getPhotoData(pick.id).then(function (d) { return d || photoUrl; })
+        : Promise.resolve(photoUrl);
+      photoReady.then(function (resolvedPhoto) {
+      return window.UFTradingCard.generate({
         name: pick.name,
         team: pick.team,
         pos: pick.pos,
         why: pick.quote,
         ig: pick.credit,
         pickNum: pick.pickNum,
-        photo: safePhotoUrl(pick.photo) || ''
+        photo: resolvedPhoto
       }, { size: 'feed' }).then(function (blob) {
         var filename = 'share-your-hottie-card.png';
         function downloadCard() {
@@ -236,6 +243,7 @@
         downloadCard();
       }, function () {
         done(null);
+      });
       });
     });
     return btn;

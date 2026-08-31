@@ -157,6 +157,22 @@
         });
     },
 
+    /** v5: fetch an approved row's uploaded photo as a data-URL (canvas-safe).
+     *  Resolves null when there's no uploaded photo or on any failure. */
+    getPhotoData: function (id) {
+      id = String(id || '').trim();
+      if (!id) return Promise.resolve(null);
+      return fetch(UF_BACKEND_URL + '?action=photoData&id=' + encodeURIComponent(id), { redirect: 'follow' })
+        .then(function (res) { return res.json(); })
+        .then(function (out) {
+          if (out && out.ok === true && out.data) {
+            return 'data:' + (out.mime || 'image/jpeg') + ';base64,' + out.data;
+          }
+          return null;
+        })
+        .catch(function () { return null; });
+    },
+
     /** Moderation lives in the Google Sheet — not available from the site. */
     setStatus: function () {
       throw new Error('setStatus is not available: moderate in the Google Sheet (see backend/WIRING.md).');

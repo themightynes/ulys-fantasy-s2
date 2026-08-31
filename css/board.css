@@ -431,3 +431,9 @@
     padding: 14px 20px;
   }
 }
+
+/* Deep-linked cards (#pick-<id>) land clear of the sticky header —
+   same pattern as cast.css's anchor offsets. */
+.slot {
+  scroll-margin-top: calc(var(--header-h, 84px) + 24px);
+}

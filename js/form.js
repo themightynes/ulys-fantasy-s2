@@ -127,6 +127,137 @@
   fields.consent.addEventListener('change', function () { refresh(); clearError(); });
   refresh();
 
+  /* ---- Player typeahead + team auto-fill ---------------------------------
+     Native <datalist> fed by a static snapshot of active NFL players
+     (assets/data/players.json, built from Sleeper — see assets/data/README.md).
+     Lazy: fetched on FIRST focus of the name field only. Any failure degrades
+     silently to today's plain text input — the datalist just stays empty.
+
+     Auto-fill rule (client decision): picking/typing a name that matches
+     EXACTLY ONE player fills the Team select — and ONLY while the select is
+     still on its empty placeholder. It never overwrites a chosen team
+     (including "Idk he's just hot") and NEVER touches Position. Names shared
+     by two players (there are several) are ambiguous → no fill. */
+  var TEAM_NICK = {
+    ARI: 'Cardinals', ATL: 'Falcons', BAL: 'Ravens', BUF: 'Bills',
+    CAR: 'Panthers', CHI: 'Bears', CIN: 'Bengals', CLE: 'Browns',
+    DAL: 'Cowboys', DEN: 'Broncos', DET: 'Lions', GB: 'Packers',
+    HOU: 'Texans', IND: 'Colts', JAX: 'Jaguars', KC: 'Chiefs',
+    LAC: 'Chargers', LAR: 'Rams', LV: 'Raiders', MIA: 'Dolphins',
+    MIN: 'Vikings', NE: 'Patriots', NO: 'Saints', NYG: 'Giants',
+    NYJ: 'Jets', PHI: 'Eagles', PIT: 'Steelers', SEA: 'Seahawks',
+    SF: '49ers', TB: 'Buccaneers', TEN: 'Titans', WAS: 'Commanders'
+  };
+  var datalist = document.getElementById('nfl-players');
+  var playersByName = null; // lowercased name → {team} | {ambiguous:true}
+  var playersLoading = false;
+
+  function teamOptionExists(nick) {
+    for (var i = 0; i < fields.team.options.length; i++) {
+      if (fields.team.options[i].value === nick) return true;
+    }
+    return false;
+  }
+
+  function loadPlayers() {
+    if (playersLoading || playersByName || !datalist || !window.fetch) return;
+    playersLoading = true;
+    fetch('assets/data/players.json')
+      .then(function (res) {
+        if (!res.ok) throw new Error('players.json ' + res.status);
+        return res.json();
+      })
+      .then(function (list) {
+        if (!Array.isArray(list)) throw new Error('bad players.json shape');
+        var map = {};
+        var frag = document.createDocumentFragment();
+        list.forEach(function (p) {
+          if (!p || !p.n) return;
+          var opt = document.createElement('option');
+          opt.value = p.n; // datalist value = what fills the field; name only
+          frag.appendChild(opt);
+          var key = p.n.toLowerCase();
+          if (map[key]) map[key].ambiguous = true;
+          else map[key] = { team: p.t, ambiguous: false };
+        });
+        datalist.appendChild(frag);
+        playersByName = map;
+        maybeFillTeam();
+      })
+      .catch(function () { /* silent — field stays a plain text input */ });
+  }
+
+  function maybeFillTeam() {
+    if (!playersByName) return;
+    if (fields.team.value !== '') return; // only fill the empty placeholder
+    var hit = playersByName[fields.name.value.trim().toLowerCase()];
+    if (!hit || hit.ambiguous) return;
+    var nick = TEAM_NICK[hit.team];
+    if (nick && teamOptionExists(nick)) {
+      fields.team.value = nick;
+      refresh();
+    }
+  }
+
+  fields.name.addEventListener('focus', loadPlayers, { once: true });
+  ['input', 'change'].forEach(function (evt) {
+    fields.name.addEventListener(evt, maybeFillTeam);
+  });
+
+  /* ---- Duplicate soft nudge ----------------------------------------------
+     If the typed name is already on the public board (UFStore approved list),
+     show a friendly note under the field with a deep link to that card.
+     Purely informational: never blocks or nags on submit. */
+  var dupeEl = document.getElementById('f-dupe');
+
+  function normName(s) {
+    return String(s || '').toLowerCase().trim().replace(/\s+/g, ' ');
+  }
+
+  /* Must mirror board.js's anchor sanitizer exactly (id="pick-<safe id>"). */
+  function anchorId(id) {
+    return 'pick-' + String(id).replace(/[^A-Za-z0-9_-]/g, '-');
+  }
+
+  var dupeShownFor = null; // anchor href currently rendered ('' = hidden)
+
+  function checkDupe() {
+    if (!dupeEl) return;
+    var typed = normName(fields.name.value);
+    var match = null;
+    if (typed && window.UFStore && typeof window.UFStore.getApproved === 'function') {
+      var approved = window.UFStore.getApproved();
+      for (var i = 0; i < approved.length; i++) {
+        if (normName(approved[i].name) === typed) { match = approved[i]; break; }
+      }
+    }
+    if (!match) {
+      if (!dupeEl.hidden) { dupeEl.hidden = true; dupeEl.textContent = ''; }
+      dupeShownFor = null;
+      return;
+    }
+    /* Same match already rendered → leave the DOM alone. Crucial: clicking
+       the link blurs the name field, and blur re-runs this check — rebuilding
+       here would detach the <a> mid-click and swallow the navigation. */
+    var target = 'board.html#' + anchorId(match.id);
+    if (dupeShownFor === target) return;
+    dupeShownFor = target;
+    // Rebuild via textContent/appendChild only — names are user-sourced.
+    dupeEl.textContent = "He's already on the board — ";
+    var kiss = document.createElement('a');
+    kiss.className = 'scout__dupe-link';
+    kiss.href = target;
+    kiss.textContent = 'send him a kiss';
+    dupeEl.appendChild(kiss);
+    dupeEl.appendChild(document.createTextNode(' instead 💋'));
+    dupeEl.hidden = false;
+  }
+
+  ['input', 'change', 'blur'].forEach(function (evt) {
+    fields.name.addEventListener(evt, checkDupe);
+  });
+  window.addEventListener('ufstore:updated', checkDupe);
+
   /* ---- Photo upload (compress client-side at select time) ---------------- */
   var PHOTO_MAX_SIDE = 1200;      // longest side after resize
   var PHOTO_JPEG_QUALITY = 0.82;

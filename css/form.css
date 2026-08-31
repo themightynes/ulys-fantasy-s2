@@ -515,3 +515,24 @@
   font-family: var(--font-editorial);
   font-size: 14px;
 }
+
+/* Duplicate soft nudge — editorial pink whisper under the name field.
+   Informational only; submitting stays fully allowed. */
+.scout__dupe {
+  margin-top: 8px;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--bubblegum);
+}
+.scout__dupe-link {
+  color: var(--pink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.scout__dupe-link:hover { color: var(--pink-deep); }
+.scout__dupe-link:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}

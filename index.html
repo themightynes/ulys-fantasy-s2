@@ -102,7 +102,9 @@
       <form id="scout-form" class="scout" novalidate>
         <div class="scout__field">
           <label class="scout__label" for="f-name">Player name <span class="scout__req" aria-hidden="true">*</span></label>
-          <input class="scout__input" id="f-name" name="name" type="text" autocomplete="off" required placeholder="Full name or alias">
+          <input class="scout__input" id="f-name" name="name" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" required placeholder="Full name or alias" list="nfl-players">
+          <datalist id="nfl-players"></datalist>
+          <p class="scout__dupe" id="f-dupe" aria-live="polite" hidden></p>
         </div>
 
         <div class="scout__field">

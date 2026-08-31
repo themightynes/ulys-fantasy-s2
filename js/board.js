@@ -258,9 +258,16 @@
     return badge;
   }
 
+  /* Must mirror form.js's anchor sanitizer exactly — the dupe nudge links to
+     board.html#pick-<safe id>. */
+  function anchorId(id) {
+    return 'pick-' + String(id).replace(/[^A-Za-z0-9_-]/g, '-');
+  }
+
   function filledCard(n, pick) {
     var isCommish = !!pick.isCommish;
     var card = el('article', 'slot slot--filled' + (pick.isCommishPhoto ? ' slot--gold' : ''));
+    if (pick.isFan && pick.id != null) card.id = anchorId(pick.id);
     card.appendChild(numTag(n, pick.isCommishPhoto ? 'gold' : 'pink'));
     if (pick.isFave) card.appendChild(faveBadge());
 
@@ -388,7 +395,42 @@
       countEl.textContent = 'Round 1 · Official scouting · ' +
         filled + ' of ' + total + ' picks filed';
     }
+
+    scrollToHashCard();
   }
+
+  /* ---------- #pick-<id> deep links ----------
+     Fan cards render AFTER the store's async refresh with the remote adapter,
+     so native fragment scrolling fires too early. Once the linked card exists,
+     scroll to it exactly once — later re-renders never re-hijack scroll. */
+  var hashScrolled = false;
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* The sticky header wraps taller on narrow screens (134px @390, 172px @320)
+     — publish its real height so .slot's scroll-margin-top clears it. */
+  var headerEl = document.querySelector('.board-header');
+  function setHeaderVar() {
+    if (headerEl) {
+      document.documentElement.style.setProperty('--header-h', headerEl.offsetHeight + 'px');
+    }
+  }
+  setHeaderVar();
+
+  function scrollToHashCard() {
+    setHeaderVar();
+    if (hashScrolled) return;
+    var h = window.location.hash;
+    if (h.indexOf('#pick-') !== 0) return;
+    var target = document.getElementById(h.slice(1));
+    if (!target) return;
+    hashScrolled = true;
+    target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  window.addEventListener('hashchange', function () {
+    hashScrolled = false;
+    scrollToHashCard();
+  });
 
   /* ---------- countdown ---------- */
 
@@ -453,6 +495,7 @@
   window.addEventListener('resize', function () {
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
+      setHeaderVar();
       if (columnCount() !== lastCols) renderBoard();
     }, 200);
   });

@@ -45,6 +45,7 @@
   var errorEl = document.getElementById('f-error');
   var confirmLine = document.getElementById('takeover-line');
   var shareBtn = document.getElementById('takeover-share');
+  var cardBtn = document.getElementById('takeover-card');
   var againBtn = document.getElementById('takeover-again');
 
   var params = new URLSearchParams(window.location.search);
@@ -191,6 +192,17 @@
     }
     clearError();
     var scoutedName = fields.name.value.trim();
+    /* Snapshot everything the trading card needs NOW — closeTakeover() resets
+       the form and clears photoData, and the card must survive that. */
+    var cardSnapshot = {
+      name: scoutedName,
+      team: fields.team.value,
+      pos: fields.pos.value,
+      why: fields.why.value.trim(),
+      ig: fields.ig.value,
+      pickNum: null,          // still pending — the card renders "PROSPECT №?"
+      photo: photoData || ''  // locally compressed data-URL: same-origin safe
+    };
     submitting = true;
     submitBtn.setAttribute('aria-disabled', 'true');
     submitBtn.textContent = 'Filing…';
@@ -215,7 +227,7 @@
         submitting = false;
         submitBtn.textContent = submitLabel;
         refresh();
-        openTakeover(scoutedName);
+        openTakeover(scoutedName, cardSnapshot);
       })
       .catch(function (err) {
         submitting = false;
@@ -227,11 +239,13 @@
   });
 
   /* ---- Takeover ----------------------------------------------------------- */
-  function openTakeover(name) {
+  function openTakeover(name, snapshot) {
     lastScoutedName = name || '';
+    lastCardData = snapshot || { name: name || '', pickNum: null };
     confirmLine.textContent = (name || 'Your prospect') +
       ' has been filed with Besties HQ. Grades drop on draft day.';
     shareBtn.textContent = 'Share to story';
+    if (cardBtn) resetCardBtn();
     lastFocus = document.activeElement;
     takeover.hidden = false;
     if (!reducedMotion) {
@@ -241,7 +255,9 @@
       takeover.classList.remove('takeover--enter');
     }
     document.body.style.overflow = 'hidden';
-    shareBtn.focus();
+    // shareBtn is hidden on desktop — focus the first action that's actually there
+    var firstAction = focusables()[0];
+    if (firstAction) firstAction.focus();
     document.addEventListener('keydown', onKeydown, true);
   }
 
@@ -257,6 +273,15 @@
     lastFocus = null;
   }
 
+  /** Tabbable actions inside the takeover, hidden ones excluded (the story
+   *  share button is display-hidden on desktop). */
+  function focusables() {
+    return Array.prototype.filter.call(
+      takeover.querySelectorAll('button, a[href]'),
+      function (node) { return !node.hidden && !node.disabled && node.offsetParent !== null; }
+    );
+  }
+
   function onKeydown(e) {
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -264,10 +289,10 @@
       return;
     }
     if (e.key !== 'Tab') return;
-    var focusables = takeover.querySelectorAll('button, a[href]');
-    if (!focusables.length) return;
-    var first = focusables[0];
-    var last = focusables[focusables.length - 1];
+    var list = focusables();
+    if (!list.length) return;
+    var first = list[0];
+    var last = list[list.length - 1];
     if (e.shiftKey && document.activeElement === first) {
       e.preventDefault();
       last.focus();
@@ -348,6 +373,83 @@
       })
       .then(function () { sharing = false; });
   });
+
+  /* ---- Trading card ------------------------------------------------------
+     Shown on BOTH desktop and mobile (unlike the story share button):
+     mobile gets the share sheet, desktop downloads the PNG. */
+  var CARD_LABEL = 'Make my trading card';
+  var CARD_FILENAME = 'share-your-hottie-card.png';
+  var lastCardData = null;
+  var makingCard = false;
+
+  function setCardLabel(text) {
+    if (!cardBtn) return;
+    cardBtn.textContent = '';
+    var glyph = document.createElement('span');
+    glyph.className = 'takeover__card-glyph';
+    glyph.setAttribute('aria-hidden', 'true');
+    glyph.textContent = '🃏';
+    cardBtn.appendChild(glyph);
+    cardBtn.appendChild(document.createTextNode(' ' + text));
+  }
+
+  function resetCardBtn() {
+    makingCard = false;
+    cardBtn.setAttribute('aria-disabled', 'false');
+    setCardLabel(CARD_LABEL);
+  }
+
+  if (cardBtn) {
+    cardBtn.addEventListener('click', function () {
+      if (makingCard) return;
+      if (!window.UFTradingCard || !window.UFTradingCard.generate) {
+        setCardLabel("Card generator didn't load — refresh and try again");
+        return;
+      }
+      makingCard = true;
+      cardBtn.setAttribute('aria-disabled', 'true');
+      setCardLabel('Making your card…');
+
+      window.UFTradingCard.generate(lastCardData || {}, { size: 'feed' })
+        .then(function (blob) {
+          function downloadCard() {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = CARD_FILENAME;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+            makingCard = false;
+            cardBtn.setAttribute('aria-disabled', 'false');
+            setCardLabel('Card saved — post it!');
+          }
+          var file = new File([blob], CARD_FILENAME, { type: 'image/png' });
+          if (isMobileShare && navigator.canShare && navigator.canShare({ files: [file] })) {
+            return navigator.share({ files: [file], text: SHARE_TEXT })
+              .then(function () {
+                makingCard = false;
+                cardBtn.setAttribute('aria-disabled', 'false');
+                setCardLabel('Shared — go post it!');
+              })
+              .catch(function (err) {
+                if (err && err.name === 'AbortError') {
+                  resetCardBtn(); // user dismissed the sheet on purpose
+                } else {
+                  downloadCard();
+                }
+              });
+          }
+          downloadCard();
+        })
+        .catch(function () {
+          makingCard = false;
+          cardBtn.setAttribute('aria-disabled', 'false');
+          setCardLabel("Couldn't make your card — try again");
+        });
+    });
+  }
 
   againBtn.addEventListener('click', closeTakeover);
 

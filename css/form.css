@@ -360,6 +360,7 @@
 }
 
 .takeover__share,
+.takeover__card-btn,
 .takeover__board {
   font-family: var(--font-display);
   font-size: 20px;
@@ -379,9 +380,26 @@
               transform var(--dur-fast) var(--ease);
 }
 
+/* form.js sets [hidden] on the story-share button on desktop; the shared
+   display:inline-flex above would otherwise override the UA's display:none. */
+.takeover__share[hidden] { display: none; }
+
 .takeover__share { background: var(--navy); color: #fff; }
 .takeover__share:hover { background: var(--navy-deep); }
 .takeover__share:active { transform: translateY(2px); }
+
+/* Trading card: broadcast chrome — the same plate gradient the card itself
+   uses. Shown on desktop AND mobile (unlike the story share button). */
+.takeover__card-btn {
+  background: linear-gradient(90deg, #F4F2F7, #D9DEE8);
+  color: var(--navy);
+  box-shadow: inset 0 0 0 2px var(--navy);
+  gap: 8px;
+}
+.takeover__card-btn:hover { background: var(--navy); color: #fff; }
+.takeover__card-btn:active { transform: translateY(2px); }
+.takeover__card-btn[aria-disabled="true"] { cursor: progress; }
+.takeover__card-glyph { font-size: 22px; line-height: 1; }
 
 .takeover__board { background: #fff; color: var(--pink); }
 .takeover__board:hover { background: var(--navy); color: #fff; }

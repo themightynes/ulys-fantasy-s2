@@ -286,6 +286,41 @@
 }
 .slot__kiss-lips { font-size: 13px; line-height: 1; }
 
+/* ---- 🃏 trading-card button (same vocabulary as the kiss button) ---- */
+.slot__acts {
+  display: inline-flex;
+  align-items: center;
+  /* 14px = the two ::before tap extenders (6px + 8px) meeting exactly, so
+     neither button steals the other's hit area. */
+  gap: 14px;
+  flex-shrink: 0;
+}
+.slot__card {
+  position: relative; /* anchors the ::before tap-target extender */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--cyan);
+  border: 1px solid var(--line-cyan);
+  padding: 6px 9px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+/* Button box is ~27px tall; -12px/-8px inset = 51px effective hit area (>=44px). */
+.slot__card::before { content: ""; position: absolute; inset: -12px -6px; }
+.slot__card:hover { background: rgba(67, 232, 255, 0.16); border-color: var(--cyan); }
+.slot__card:active { background: rgba(67, 232, 255, 0.28); border-color: var(--cyan); }
+.slot__card:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.slot__card--busy { cursor: progress; border-color: var(--cyan); }
+.slot__card--done { background: rgba(67, 232, 255, 0.28); border-color: var(--cyan); }
+.slot__card-glyph { font-size: 13px; line-height: 1; }
+
 /* ---- FAN FAVORITE badge (pink — gold stays reserved for Uly/№1) ---- */
 .slot__fave {
   position: absolute;

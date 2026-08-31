@@ -92,6 +92,25 @@
     if (errorEl.textContent) errorEl.textContent = '';
   }
 
+  /* ---- Time-trap ---------------------------------------------------------
+     Record when this human FIRST touched the form. form.js sends the elapsed
+     ms with the submission; the backend silently drops anything that arrives
+     implausibly fast (MIN_FILL_MS / timeTrapSuspect_ in backend/apps-script.gs
+     — currently 1.5s, a threshold no human fill can reach).
+
+     Clocked from first interaction, not page load, so a fan who leaves the tab
+     open for an hour and then fills it out is never penalised. Not reset by
+     closeTakeover(): after "scout another", elapsed just keeps growing, and a
+     LARGE value always passes — the safe direction. Capture-phase listeners on
+     the form so they fire no matter which control is touched first, and
+     `once` so this costs nothing after the first event. */
+  var firstTouch = 0;
+  ['pointerdown', 'keydown', 'focusin', 'change'].forEach(function (evt) {
+    form.addEventListener(evt, function () {
+      if (!firstTouch) firstTouch = Date.now();
+    }, { capture: true, once: true });
+  });
+
   ['name', 'team', 'why', 'pos', 'photo', 'ig'].forEach(function (k) {
     fields[k].addEventListener('input', function () { refresh(); clearError(); });
   });
@@ -220,7 +239,10 @@
           photo: fields.photo.value,
           photoData: photoData, // '' when no upload; adapters treat as absent
           ig: fields.ig.value,
-          hp: fields.hp ? fields.hp.value : ''
+          hp: fields.hp ? fields.hp.value : '',
+          // ms from first interaction to submit. 0 = the form was submitted
+          // without a human ever touching it (scripted POST through the page).
+          elapsedMs: firstTouch ? (Date.now() - firstTouch) : 0
         });
       })
       .then(function () {

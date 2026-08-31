@@ -88,8 +88,14 @@
         // column (overriding any pasted link).
         photoData: String(data.photoData || ''),
         ig: String(data.ig || '').trim(),
-        hp: String(data.hp || '')
+        hp: String(data.hp || ''),
+        // v6 time-trap: ms between the user's first touch of the form and
+        // submit. The backend silently drops sub-3s submissions. Sent as a
+        // number; omitted entirely when the caller didn't supply one, because
+        // the backend treats "absent" as human (see timeTrapSuspect_).
+        elapsedMs: Number(data.elapsedMs)
       };
+      if (!isFinite(payload.elapsedMs)) delete payload.elapsedMs;
       return fetch(UF_BACKEND_URL, {
         method: 'POST',
         body: JSON.stringify(payload), // string body → text/plain, simple request
@@ -107,6 +113,7 @@
           payload.status = 'pending';
           payload.ts = new Date().toISOString(); // ISO string, like refresh() rows
           delete payload.hp;
+          delete payload.elapsedMs; // transport-only signals never enter the record
           delete payload.photoData; // the record travels light — Drive has the bytes
           return payload;
         })

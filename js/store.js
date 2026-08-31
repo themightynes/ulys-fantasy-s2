@@ -196,7 +196,9 @@
      * On network failure it resolves with the stale cache (no event).
      */
     refresh: function () {
-      return fetch(UF_BACKEND_URL + '?action=approved', { redirect: 'follow' })
+      // _=timestamp busts Safari's HTTP cache of this GET (server work is
+      // still bounded by the backend's own 30s CacheService window).
+      return fetch(UF_BACKEND_URL + '?action=approved&_=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
         .then(function (res) {
           if (!res.ok) throw friendlyError();
           return res.json();

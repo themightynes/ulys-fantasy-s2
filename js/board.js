@@ -435,6 +435,18 @@
   });
   if (window.UFStore && typeof window.UFStore.refresh === 'function') {
     window.UFStore.refresh();
+
+    /* iOS Safari re-opens the tab without reloading — refetch whenever the
+       board becomes visible again, plus a gentle poll while it's on screen. */
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) window.UFStore.refresh();
+    });
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) window.UFStore.refresh(); // back-forward cache restore
+    });
+    setInterval(function () {
+      if (!document.hidden) window.UFStore.refresh();
+    }, 60000);
   }
 
   var resizeTimer = null;

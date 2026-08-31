@@ -269,7 +269,10 @@
     ctx.beginPath();
     ctx.rect(x, y, w, h);
     ctx.clip();
-    ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    // Match the board's face bias (object-position: center 18%): anchor the
+    // crop 18% from the image top instead of dead center.
+    var dy = (h - dh) * 0.18;
+    ctx.drawImage(img, x + (w - dw) / 2, y + dy, dw, dh);
     ctx.restore();
   }
 

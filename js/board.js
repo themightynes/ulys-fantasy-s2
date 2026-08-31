@@ -167,6 +167,80 @@
     return btn;
   }
 
+  /** The 🃏 button in an approved fan card's footer — downloads (desktop) or
+   *  shares (mobile) that pick's Hottie Trading Card as a PNG. Stateless:
+   *  renderBoard() rebuilds it on every render, exactly like the kiss button. */
+  var isMobileShare = window.matchMedia('(pointer: coarse)').matches &&
+    !!(navigator.canShare && navigator.share);
+
+  function cardButton(pick) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'slot__card';
+    btn.setAttribute('aria-label', 'Download ' + pick.name + "'s trading card");
+    var glyph = el('span', 'slot__card-glyph', '🃏');
+    glyph.setAttribute('aria-hidden', 'true');
+    btn.appendChild(glyph);
+
+    var busy = false;
+    btn.addEventListener('click', function () {
+      if (busy) return;
+      if (!window.UFTradingCard || !window.UFTradingCard.generate) return;
+      busy = true;
+      btn.classList.add('slot__card--busy');
+      btn.setAttribute('aria-disabled', 'true');
+
+      function done(cls) {
+        busy = false;
+        btn.classList.remove('slot__card--busy');
+        btn.setAttribute('aria-disabled', 'false');
+        if (cls) {
+          btn.classList.add(cls);
+          setTimeout(function () { btn.classList.remove(cls); }, 1600);
+        }
+      }
+
+      /* safePhotoUrl keeps the local adapter's '[uploaded photo]' marker out;
+         a real cross-origin URL is attempted and silently dropped by
+         UFTradingCard if it would taint the canvas. */
+      window.UFTradingCard.generate({
+        name: pick.name,
+        team: pick.team,
+        pos: pick.pos,
+        why: pick.quote,
+        ig: pick.credit,
+        pickNum: pick.pickNum,
+        photo: safePhotoUrl(pick.photo) || ''
+      }, { size: 'feed' }).then(function (blob) {
+        var filename = 'share-your-hottie-card.png';
+        function downloadCard() {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+          done('slot__card--done');
+        }
+        var file = new File([blob], filename, { type: 'image/png' });
+        if (isMobileShare && navigator.canShare && navigator.canShare({ files: [file] })) {
+          return navigator.share({ files: [file] })
+            .then(function () { done('slot__card--done'); })
+            .catch(function (err) {
+              if (err && err.name === 'AbortError') done(null);
+              else downloadCard();
+            });
+        }
+        downloadCard();
+      }, function () {
+        done(null);
+      });
+    });
+    return btn;
+  }
+
   function faveBadge() {
     var badge = el('span', 'slot__fave');
     badge.appendChild(document.createTextNode('Fan favorite '));
@@ -210,7 +284,10 @@
       foot.appendChild(el('span', 'slot__commish', 'Uly’s pick'));
     }
     if (pick.isFan) {
-      foot.appendChild(kissButton(pick));
+      var acts = el('span', 'slot__acts');
+      acts.appendChild(cardButton(pick));
+      acts.appendChild(kissButton(pick));
+      foot.appendChild(acts);
     }
     body.appendChild(foot);
     card.appendChild(body);
@@ -274,13 +351,16 @@
     });
 
     approved.forEach(function (sub) {
-      frag.appendChild(filledCard(n++, {
+      var slot = n++; // capture BEFORE the literal below reads it (pickNum)
+      frag.appendChild(filledCard(slot, {
         id: sub.id,
         name: sub.name,
         team: sub.team,
+        pos: sub.pos,
         quote: sub.why,
         credit: atHandle(sub.ig),
         photo: sub.photo,
+        pickNum: slot,
         votes: Number(sub.votes) || 0,
         isFan: true,
         isFave: sub.id === faveId,
@@ -296,7 +376,7 @@
     grid.textContent = '';
     grid.appendChild(frag);
 
-    if (countEl) {
+    if (false && countEl) {
       countEl.textContent = 'Round 1 · Official scouting · ' +
         filled + ' of ' + total + ' picks filed';
     }
@@ -326,10 +406,11 @@
      these events — every line here is a harmless no-op there. */
   var offlineNote = null;
   function toggleOfflineNote(on) {
-    if (on && !offlineNote && countEl && countEl.parentNode) {
+    var titleInner = document.querySelector('.board-title__inner');
+    if (on && !offlineNote && titleInner) {
       offlineNote = el('p', 'board-title__offline',
         "Couldn't reach Besties HQ — fan picks will appear when it's back.");
-      countEl.parentNode.insertBefore(offlineNote, countEl.nextSibling);
+      titleInner.appendChild(offlineNote);
     } else if (!on && offlineNote) {
       if (offlineNote.parentNode) offlineNote.parentNode.removeChild(offlineNote);
       offlineNote = null;

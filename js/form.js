@@ -317,7 +317,7 @@
           var url = URL.createObjectURL(blob);
           var a = document.createElement('a');
           a.href = url;
-          a.download = 'my-hottie.png';
+          a.download = 'share-your-hottie.png';
           document.body.appendChild(a);
           a.click();
           a.remove();
@@ -327,7 +327,7 @@
           }
           shareBtn.textContent = 'Graphic saved — post it!';
         }
-        var file = new File([blob], 'my-hottie.png', { type: 'image/png' });
+        var file = new File([blob], 'share-your-hottie.png', { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           return navigator.share({ files: [file], text: SHARE_TEXT })
             .then(function () { shareBtn.textContent = 'Shared — go post it!'; })

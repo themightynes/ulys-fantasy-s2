@@ -318,6 +318,38 @@
     ctx.restore();
   }
 
+  /* The wink card — Uly winking under the wordmark (assets/img/opt/
+     portrait-logo-og.jpg), drawn as a tilted navy-framed sticker in the open
+     pink stretch between the plate and the lower third. Skipped gracefully
+     if the image isn't available (offline) — the card still renders. */
+  var winkImg = null;
+  function loadWink() {
+    return new Promise(function (resolve) {
+      if (winkImg) return resolve(winkImg);
+      var img = new Image();
+      img.onload = function () { winkImg = img; resolve(img); };
+      img.onerror = function () { resolve(null); };
+      img.src = 'assets/img/opt/portrait-logo-og.jpg';
+    });
+  }
+
+  function drawWinkCard(ctx) {
+    if (!winkImg) return;
+    var size = 250;
+    var cx = W - 175;
+    var cy = 1358;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(4 * Math.PI / 180);
+    // solid navy offset shadow (takeover-screen treatment)
+    ctx.fillStyle = NAVY;
+    ctx.fillRect(-size / 2 + 12, -size / 2 + 12, size, size);
+    // navy frame + image
+    ctx.fillRect(-size / 2 - 8, -size / 2 - 8, size + 16, size + 16);
+    ctx.drawImage(winkImg, -size / 2, -size / 2, size, size);
+    ctx.restore();
+  }
+
   function render(playerName) {
     var canvas = document.createElement('canvas');
     canvas.width = W;
@@ -331,6 +363,7 @@
     drawBreakingChip(ctx);
     drawHeadline(ctx);
     drawPlate(ctx, playerName);
+    drawWinkCard(ctx);
     drawLowerThird(ctx);
     drawLinkBar(ctx);
 
@@ -346,7 +379,8 @@
         document.fonts.load('150px Anton'),
         document.fonts.load('italic 40px "Instrument Serif"'),
         document.fonts.load('28px "Space Mono"'),
-        document.fonts.load('700 28px "Space Mono"')
+        document.fonts.load('700 28px "Space Mono"'),
+        loadWink()
       ]).then(function () {
         var canvas = render(playerName);
         return new Promise(function (resolve, reject) {

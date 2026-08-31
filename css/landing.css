@@ -222,17 +222,19 @@
 }
 
 /* Quiet lore entry point under the hero CTAs */
+.hero__cast-wrap { text-align: center; }
 .hero__cast-link {
-  display: block;
+  display: inline-block;
   margin-top: 18px;
-  text-align: center;
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold);
+  background: linear-gradient(140deg, #FFF3C4, var(--gold));
+  color: #3A2B00;
   text-decoration: none;
   border-bottom: none;
-  padding: 6px 0;
+  padding: 10px 18px;
+  font-weight: 700;
 }
-.hero__cast-link:hover { color: #FFF3C4; }
+.hero__cast-link:hover { background: var(--gold); color: #1F1600; }
 .hero__cast-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }

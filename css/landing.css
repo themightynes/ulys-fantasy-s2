@@ -229,10 +229,10 @@
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--gold);
   text-decoration: none;
   border-bottom: none;
   padding: 6px 0;
 }
-.hero__cast-link:hover { color: var(--cyan); }
+.hero__cast-link:hover { color: #FFF3C4; }
 .hero__cast-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }

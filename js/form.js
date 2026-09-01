@@ -152,6 +152,14 @@
   var playersByName = null; // lowercased name → {team} | {ambiguous:true}
   var playersLoading = false;
 
+  /* All iOS browsers are WebKit, and WebKit's datalist suggestion UI has
+     frozen the name field on real devices. iOS gets a plain text input —
+     the players.json load still powers team/position autofill and the
+     dupe nudge, which don't need the dropdown. */
+  var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (IOS && fields.name) fields.name.removeAttribute('list');
+
   function teamOptionExists(nick) {
     for (var i = 0; i < fields.team.options.length; i++) {
       if (fields.team.options[i].value === nick) return true;
@@ -194,7 +202,7 @@
   var lastSuggestKey = null;
 
   function fillDatalist() {
-    if (!datalist || !playerNames) return;
+    if (IOS || !datalist || !playerNames) return;
     var typed = fields.name.value.trim().toLowerCase();
     var key = typed.length >= 2 ? typed : '';
     if (key === lastSuggestKey) return;
@@ -464,10 +472,13 @@
           elapsedMs: firstTouch ? (Date.now() - firstTouch) : 0
         });
       })
-      .then(function () {
+      .then(function (record) {
         submitting = false;
         submitBtn.textContent = submitLabel;
         refresh();
+        // Bank the stored id: the takeover's second-chance photo also files
+        // to the Sheet's photoPending column when this is available.
+        lastSubmissionId = (record && record.id) ? String(record.id) : '';
         openTakeover(scoutedName, cardSnapshot);
       })
       .catch(function (err) {
@@ -479,36 +490,31 @@
       });
   });
 
-  /* ---- Takeover no-photo second chance (card-only) -----------------------
-     The banked row can't be updated from here — the added photo lands ONLY
-     in lastCardData so the trading-card / story renders include the face. */
+  /* ---- Takeover no-photo second chance -----------------------------------
+     A compact, non-blocking nudge between the message line and the actions —
+     the share/card actions are the reward and are NEVER gated behind it.
+     An added photo lands in lastCardData (so the trading-card / story renders
+     include the face) AND — when the banked submission id is known — is filed
+     to the Sheet's photoPending column via UFStore.attachPhoto, for Besties
+     HQ to promote at approval time (fire-and-forget; errors are non-fatal
+     and the card behavior is unchanged). */
   var NOPHOTO_LINE = "One problem: his file has no photo. Your card's just a navy rectangle with his name on it.";
   var nophotoBlock = document.getElementById('takeover-nophoto');
   var nophotoLine = document.getElementById('takeover-nophoto-line');
   var addPhotoBtn = document.getElementById('takeover-addphoto');
-  var skipPhotoBtn = document.getElementById('takeover-skipphoto');
   var takeoverPhotoFile = document.getElementById('takeover-photo-file');
-  var actionsEl = takeover.querySelector('.takeover__actions');
+  var lastSubmissionId = '';
 
   function setNophoto(show) {
-    if (!nophotoBlock || !actionsEl) return;
+    if (!nophotoBlock) return;
     if (show) {
       nophotoLine.textContent = NOPHOTO_LINE;
       addPhotoBtn.hidden = false;
-      skipPhotoBtn.hidden = false;
       if (takeoverPhotoFile) takeoverPhotoFile.value = '';
       nophotoBlock.hidden = false;
-      actionsEl.hidden = true;
     } else {
       nophotoBlock.hidden = true;
-      actionsEl.hidden = false;
     }
-  }
-
-  function dismissNophoto() {
-    setNophoto(false);
-    var first = focusables()[0];
-    if (first) first.focus();
   }
 
   if (addPhotoBtn && takeoverPhotoFile) {
@@ -521,11 +527,18 @@
       compressPhoto(file)
         .then(function (dataUrl) {
           if (lastCardData) lastCardData.photo = dataUrl;
+          // Fire-and-forget: park the photo in the Sheet's photoPending
+          // column too, so the owner can promote it when approving the row.
+          if (lastSubmissionId && window.UFStore &&
+              typeof window.UFStore.attachPhoto === 'function') {
+            try {
+              window.UFStore.attachPhoto(lastSubmissionId, dataUrl)
+                .catch(function () { /* non-fatal — the card still gets the photo */ });
+            } catch (e) { /* non-fatal */ }
+          }
           nophotoLine.textContent = 'Gorgeous. Now go make the card.';
           addPhotoBtn.hidden = true;
-          skipPhotoBtn.hidden = true;
-          actionsEl.hidden = false;
-          var first = focusables()[0];
+          var first = actionFocusables()[0];
           if (first) first.focus();
         })
         .catch(function (err) {
@@ -534,7 +547,6 @@
         });
     });
   }
-  if (skipPhotoBtn) skipPhotoBtn.addEventListener('click', dismissNophoto);
 
   /* ---- Takeover ----------------------------------------------------------- */
   function openTakeover(name, snapshot) {
@@ -554,8 +566,10 @@
       takeover.classList.remove('takeover--enter');
     }
     document.body.style.overflow = 'hidden';
-    // shareBtn is hidden on desktop — focus the first action that's actually there
-    var firstAction = focusables()[0];
+    // First focus lands on the primary action area (shareBtn is hidden on
+    // desktop) — the photo nudge sits earlier in the DOM but must not steal
+    // focus; it stays reachable in normal tab order.
+    var firstAction = actionFocusables()[0] || focusables()[0];
     if (firstAction) firstAction.focus();
     document.addEventListener('keydown', onKeydown, true);
   }
@@ -570,6 +584,15 @@
     clearError();
     if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
     lastFocus = null;
+  }
+
+  /** Visible controls in the primary action row only (share / card / board),
+   *  for placing focus — the trap itself uses focusables() below. */
+  function actionFocusables() {
+    return Array.prototype.filter.call(
+      takeover.querySelectorAll('.takeover__actions button, .takeover__actions a[href]'),
+      function (node) { return !node.hidden && !node.disabled && node.offsetParent !== null; }
+    );
   }
 
   /** Tabbable actions inside the takeover, hidden ones excluded (the story

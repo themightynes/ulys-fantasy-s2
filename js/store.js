@@ -180,8 +180,9 @@
      * Crowd photo: file a headshot for an existing PHOTOLESS row. Same
      * text/plain no-preflight POST pattern as addSubmission. The backend
      * validates the image (jpeg/png/webp, ≤5MB decoded), saves it to Drive
-     * and writes the URL into the row's photoPending column — it appears
-     * publicly only after the owner promotes it during moderation.
+     * and writes the URL into the row's photo cell — live on the board once
+     * the server's ~30s approved-cache rolls over (client decision: no
+     * review step; first photo wins).
      * Resolves {ok:true, id}; rejects with a user-safe Error (unknown id,
      * row already has a live photo, bad image, rate limit, network down).
      */

@@ -25,11 +25,14 @@
     return node;
   }
 
-  /** Only allow http(s) URLs for fan photo links. */
+  /** Only allow http(s) URLs for fan photo links — plus inline data:image/
+   *  URIs, which the local dev adapter stores for crowd-attached photos. */
   function safePhotoUrl(raw) {
     if (!raw) return null;
+    var s = String(raw);
+    if (/^data:image\//.test(s)) return s;
     try {
-      var u = new URL(String(raw), window.location.href);
+      var u = new URL(s, window.location.href);
       if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
     } catch (e) { /* not a URL */ }
     return null;
@@ -100,11 +103,12 @@
   }
 
   /* ---------- crowd photos (file a headshot for a photoless pick) ----------
-     The photo NEVER renders here — it lands in photoPending for Besties HQ
-     to review (moderation gate). renderBoard() rebuilds every card on the
-     refresh poll, so filed ids are remembered module-wide and re-render as
-     the success line instead of the button. */
-  var ATTACH_DONE_MSG = 'Filed. Besties HQ will review. 💋';
+     Client decision: crowd photos go live directly — the backend writes the
+     photo cell and the card shows it once the ~30s server cache rolls over
+     (locally, on the next re-render). renderBoard() rebuilds every card on
+     the refresh poll, so filed ids are remembered module-wide and re-render
+     as the success line until the photo arrives. */
+  var ATTACH_DONE_MSG = "Filed. Give him a minute — he's getting ready. 💋";
   var ATTACH_FAIL_MSG = "Couldn't file that one — give it another go.";
   var attachedIds = {}; // id → true once this session filed a headshot
 
@@ -195,11 +199,14 @@
         })
         .then(function () {
           attachedIds[pick.id] = true;
-          // Do NOT show the photo — it is pending Besties HQ review. The note
-          // element (role=status) carries the message so it gets announced.
+          // The note (role=status) announces success; the photo itself lands
+          // on the next refresh (locally at once, live after the ~30s cache).
           btn.remove();
           note.className = 'slot__attach-done';
           note.textContent = ATTACH_DONE_MSG;
+          if (window.UFStore && typeof window.UFStore.refresh === 'function') {
+            window.UFStore.refresh();
+          }
         })
         .catch(function (err) {
           input.value = '';

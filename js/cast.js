@@ -50,8 +50,8 @@
     { name: "Corryn's Mom", label: 'Finished 10th · The 1-13 season', sticker: 'star',
       bio: '"Why is Corryn’s entire family playing. Corryn’s mom is reported to be Gwyneth Paltrow (allegedly)."',
       statLabel: 'Final record', stat: '1-13',
-      /* client decision: the blank slot claims to be Gwyneth; the card does not */
-      slotName: 'GWENYTH' }
+      photo: { src: 'assets/img/cast/corryns-mom.jpg', width: 900, height: 1200,
+               alt: "Corryn's Mom smiling in red glasses, holding a grandchild with a heart over the child's face." } }
   ];
 
   var ROOKIES = [

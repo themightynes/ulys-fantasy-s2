@@ -279,7 +279,7 @@
   object-fit: cover;
   object-position: 50% 18%;
 }
-/* Corryn's Mom gag: her blank slot claims to be Gwyneth (client decision) */
+/* Blank photo slots can carry a display name (cast.js slotName) */
 .polaroid__slot-name {
   position: absolute;
   inset: 0;

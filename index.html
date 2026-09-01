@@ -158,6 +158,25 @@
           <p class="scout__onair editorial" id="f-why-note">Maybe your reason will make it to the video!</p>
         </div>
 
+        <div class="scout__field scout__photo">
+          <label class="scout__label" for="f-photo-file"><span aria-hidden="true">📸</span> His headshot <span class="scout__opt">(optional, but c'mon)</span></label>
+          <div class="scout__photo-box">
+            <span class="scout__photo-glyph" aria-hidden="true">📸</span>
+            <input class="scout__input scout__file" id="f-photo-file" name="photoFile" type="file" accept="image/*" aria-describedby="f-photo-help">
+            <div class="scout__preview" id="f-photo-preview" hidden>
+              <img class="scout__preview-img" id="f-photo-thumb" src="" alt="Selected photo preview" width="72" height="72">
+              <span class="scout__preview-name" id="f-photo-filename"></span>
+              <button class="scout__preview-remove" id="f-photo-remove" type="button" aria-label="Remove selected photo">✕</button>
+            </div>
+          </div>
+          <p class="scout__onair editorial scout__photo-help" id="f-photo-help">No photo, no face on his card. Give the people what they want.</p>
+          <button class="scout__photo-toggle" id="f-photo-toggle" type="button" aria-expanded="false" aria-controls="f-photo-url-wrap">no photo saved? paste a link instead →</button>
+          <div class="scout__photo-url" id="f-photo-url-wrap" hidden>
+            <label class="visually-hidden" for="f-photo">Photo link (optional)</label>
+            <input class="scout__input scout__input--secondary" id="f-photo" name="photo" type="url" autocomplete="off" placeholder="https://…">
+          </div>
+        </div>
+
         <div class="scout__grid">
           <div class="scout__field">
             <label class="scout__label" for="f-pos">Position <span class="scout__opt">(optional)</span></label>
@@ -174,22 +193,10 @@
               <option>Franchise Player</option>
             </select>
           </div>
-          <div class="scout__field">
-            <label class="scout__label" for="f-photo-file">Photo <span class="scout__opt">(optional)</span></label>
-            <input class="scout__input scout__file" id="f-photo-file" name="photoFile" type="file" accept="image/*" aria-describedby="f-photo-help">
-            <div class="scout__preview" id="f-photo-preview" hidden>
-              <img class="scout__preview-img" id="f-photo-thumb" src="" alt="Selected photo preview" width="72" height="72">
-              <span class="scout__preview-name" id="f-photo-filename"></span>
-              <button class="scout__preview-remove" id="f-photo-remove" type="button" aria-label="Remove selected photo">✕</button>
-            </div>
-            <p class="scout__opt scout__file-help" id="f-photo-help">or paste a link below</p>
-            <label class="visually-hidden" for="f-photo">Photo link (optional)</label>
-            <input class="scout__input scout__input--secondary" id="f-photo" name="photo" type="url" autocomplete="off" placeholder="https://…">
-          </div>
         </div>
 
         <div class="scout__field">
-          <label class="scout__label" for="f-ig">Your IG handle <span class="scout__opt">(optional — for credit)</span></label>
+          <label class="scout__label" for="f-ig">Your IG handle <span class="scout__opt">(so Uly can tag you if your pick makes the video — he can't tag @anon)</span></label>
           <span class="scout__ig-wrap"><span class="scout__ig-at" aria-hidden="true">@</span><input class="scout__input scout__input--ig" id="f-ig" name="ig" type="text" autocomplete="off" placeholder="yourhandle" aria-describedby="f-ig-note"></span>
           <span class="scout__helper" id="f-ig-note">the @ is on us</span>
         </div>
@@ -234,6 +241,12 @@
           <p class="takeover__kicker">Official Besties HQ notice</p>
           <h2 class="takeover__title" id="takeover-title">Your Current Hottie has been scouted.</h2>
           <p class="takeover__line" id="takeover-line">Your prospect has been filed with Besties HQ. Grades drop on draft day.</p>
+          <div class="takeover__nophoto" id="takeover-nophoto" hidden>
+            <p class="takeover__nophoto-line" id="takeover-nophoto-line">One problem: his file has no photo. Your card's just a navy rectangle with his name on it.</p>
+            <button class="takeover__nophoto-btn" id="takeover-addphoto" type="button">Add his photo →</button>
+            <button class="takeover__nophoto-skip" id="takeover-skipphoto" type="button">nah, he's hot in my head</button>
+            <input id="takeover-photo-file" type="file" accept="image/*" hidden aria-hidden="true" tabindex="-1">
+          </div>
           <div class="takeover__actions">
             <button class="takeover__share" id="takeover-share" type="button">Share to story</button>
             <button class="takeover__card-btn" id="takeover-card" type="button"><span class="takeover__card-glyph" aria-hidden="true">🃏</span> Make my trading card</button>

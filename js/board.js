@@ -88,6 +88,14 @@
     return el('div', 'slot__photo slot__photo--stripes', label);
   }
 
+  /** Photoless FAN card fallback — two-line callout on the striped navy. */
+  function fanPlaceholder() {
+    var box = el('div', 'slot__photo slot__photo--stripes slot__photo--nofan');
+    box.appendChild(el('span', 'slot__photo-main', 'NO HEADSHOT ON FILE'));
+    box.appendChild(el('span', 'slot__photo-sub', 'scouts — we need visuals'));
+    return box;
+  }
+
   function commishPhoto(pick) {
     var frame = el('div', 'slot__photo slot__photo--img');
     var img = document.createElement('img');
@@ -112,7 +120,7 @@
     img.loading = 'lazy';
     img.decoding = 'async';
     img.addEventListener('error', function () {
-      var fallback = photoPlaceholder('polaroid crop · fan photo');
+      var fallback = fanPlaceholder();
       if (frame.parentNode) frame.parentNode.replaceChild(fallback, frame);
     });
     img.src = url;
@@ -277,7 +285,7 @@
       card.appendChild(photoPlaceholder('polaroid crop · fan photo'));
     } else {
       var url = safePhotoUrl(pick.photo);
-      card.appendChild(url ? fanPhoto(url, pick.name) : photoPlaceholder('polaroid crop · fan photo'));
+      card.appendChild(url ? fanPhoto(url, pick.name) : fanPlaceholder());
     }
 
     var body = el('div', 'slot__body');

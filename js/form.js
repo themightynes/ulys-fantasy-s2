@@ -178,7 +178,7 @@
           frag.appendChild(opt);
           var key = p.n.toLowerCase();
           if (map[key]) map[key].ambiguous = true;
-          else map[key] = { team: p.t, ambiguous: false };
+          else map[key] = { team: p.t, pos: p.p || '', ambiguous: false };
         });
         datalist.appendChild(frag);
         playersByName = map;
@@ -197,6 +197,41 @@
       fields.team.value = nick;
       refresh();
     }
+  }
+
+  /* ---- Silent position backfill (SUBMIT time only) -----------------------
+     If the scout left Position on "scout's discretion" AND the typed name
+     exactly matches exactly one player, the payload carries that player's
+     real position — mapped to the select's own option values. A user-chosen
+     position (the joke picks included) is NEVER overridden, and the visible
+     select is never touched. K/DEF/etc. with no matching option → blank. */
+  var POS_FILL = {
+    QB: 'Quarterback',
+    RB: 'Running Back',
+    WR: 'Wide Receiver',
+    TE: 'Tight End 😏',
+    OL: 'Offensive Line (built)',
+    OT: 'Offensive Line (built)',
+    OG: 'Offensive Line (built)',
+    G: 'Offensive Line (built)',
+    C: 'Offensive Line (built)',
+    T: 'Offensive Line (built)'
+  };
+
+  function posOptionExists(val) {
+    for (var i = 0; i < fields.pos.options.length; i++) {
+      if (fields.pos.options[i].value === val) return true;
+    }
+    return false;
+  }
+
+  function backfillPos() {
+    if (fields.pos.value !== '') return fields.pos.value; // scout's choice is sacred
+    if (!playersByName) return ''; // players.json never loaded — skip gracefully
+    var hit = playersByName[fields.name.value.trim().toLowerCase()];
+    if (!hit || hit.ambiguous) return '';
+    var mapped = POS_FILL[hit.pos];
+    return (mapped && posOptionExists(mapped)) ? mapped : '';
   }
 
   fields.name.addEventListener('focus', loadPlayers, { once: true });
@@ -322,7 +357,7 @@
         .then(function (dataUrl) {
           photoData = dataUrl;
           if (photoThumb) photoThumb.src = dataUrl;
-          if (photoFilename) photoFilename.textContent = file.name;
+          if (photoFilename) photoFilename.textContent = "Filed. He's photogenic.";
           if (photoPreview) photoPreview.hidden = false;
           refresh();
         })
@@ -340,6 +375,18 @@
     });
   }
 
+  /* "paste a link instead" — the URL input hides behind a small text toggle */
+  var photoToggle = document.getElementById('f-photo-toggle');
+  var photoUrlWrap = document.getElementById('f-photo-url-wrap');
+  if (photoToggle && photoUrlWrap) {
+    photoToggle.addEventListener('click', function () {
+      var open = photoUrlWrap.hidden;
+      photoUrlWrap.hidden = !open;
+      photoToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open && fields.photo) fields.photo.focus();
+    });
+  }
+
   var submitting = false;
   var submitLabel = submitBtn.textContent;
 
@@ -352,16 +399,20 @@
     }
     clearError();
     var scoutedName = fields.name.value.trim();
+    /* Silent backfill computed ONCE so the stored row and the trading card
+       agree; the visible select is never touched. */
+    var submitPos = fields.pos.value || backfillPos();
     /* Snapshot everything the trading card needs NOW — closeTakeover() resets
        the form and clears photoData, and the card must survive that. */
     var cardSnapshot = {
       name: scoutedName,
       team: fields.team.value,
-      pos: fields.pos.value,
+      pos: submitPos,
       why: fields.why.value.trim(),
       ig: fields.ig.value,
       pickNum: null,          // still pending — the card renders "PROSPECT №?"
-      photo: photoData || ''  // locally compressed data-URL: same-origin safe
+      photo: photoData || '', // locally compressed data-URL: same-origin safe
+      photoUrl: fields.photo.value.trim() // pasted link — counts as "has photo"
     };
     submitting = true;
     submitBtn.setAttribute('aria-disabled', 'true');
@@ -376,7 +427,7 @@
           name: fields.name.value,
           team: fields.team.value,
           why: fields.why.value,
-          pos: fields.pos.value,
+          pos: submitPos,
           photo: fields.photo.value,
           photoData: photoData, // '' when no upload; adapters treat as absent
           ig: fields.ig.value,
@@ -401,6 +452,63 @@
       });
   });
 
+  /* ---- Takeover no-photo second chance (card-only) -----------------------
+     The banked row can't be updated from here — the added photo lands ONLY
+     in lastCardData so the trading-card / story renders include the face. */
+  var NOPHOTO_LINE = "One problem: his file has no photo. Your card's just a navy rectangle with his name on it.";
+  var nophotoBlock = document.getElementById('takeover-nophoto');
+  var nophotoLine = document.getElementById('takeover-nophoto-line');
+  var addPhotoBtn = document.getElementById('takeover-addphoto');
+  var skipPhotoBtn = document.getElementById('takeover-skipphoto');
+  var takeoverPhotoFile = document.getElementById('takeover-photo-file');
+  var actionsEl = takeover.querySelector('.takeover__actions');
+
+  function setNophoto(show) {
+    if (!nophotoBlock || !actionsEl) return;
+    if (show) {
+      nophotoLine.textContent = NOPHOTO_LINE;
+      addPhotoBtn.hidden = false;
+      skipPhotoBtn.hidden = false;
+      if (takeoverPhotoFile) takeoverPhotoFile.value = '';
+      nophotoBlock.hidden = false;
+      actionsEl.hidden = true;
+    } else {
+      nophotoBlock.hidden = true;
+      actionsEl.hidden = false;
+    }
+  }
+
+  function dismissNophoto() {
+    setNophoto(false);
+    var first = focusables()[0];
+    if (first) first.focus();
+  }
+
+  if (addPhotoBtn && takeoverPhotoFile) {
+    addPhotoBtn.addEventListener('click', function () {
+      takeoverPhotoFile.click();
+    });
+    takeoverPhotoFile.addEventListener('change', function () {
+      var file = takeoverPhotoFile.files && takeoverPhotoFile.files[0];
+      if (!file) return;
+      compressPhoto(file)
+        .then(function (dataUrl) {
+          if (lastCardData) lastCardData.photo = dataUrl;
+          nophotoLine.textContent = 'Gorgeous. Now go make the card.';
+          addPhotoBtn.hidden = true;
+          skipPhotoBtn.hidden = true;
+          actionsEl.hidden = false;
+          var first = focusables()[0];
+          if (first) first.focus();
+        })
+        .catch(function (err) {
+          takeoverPhotoFile.value = '';
+          nophotoLine.textContent = (err && err.message) || "Couldn't read that photo. Try a JPG or PNG.";
+        });
+    });
+  }
+  if (skipPhotoBtn) skipPhotoBtn.addEventListener('click', dismissNophoto);
+
   /* ---- Takeover ----------------------------------------------------------- */
   function openTakeover(name, snapshot) {
     lastScoutedName = name || '';
@@ -409,6 +517,7 @@
       ' has been filed with Besties HQ. Grades drop on draft day.';
     shareBtn.textContent = 'Share to story';
     if (cardBtn) resetCardBtn();
+    setNophoto(!(lastCardData.photo || lastCardData.photoUrl));
     lastFocus = document.activeElement;
     takeover.hidden = false;
     if (!reducedMotion) {

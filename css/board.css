@@ -179,6 +179,19 @@
   text-align: center;
   padding: 0 12px;
 }
+/* Photoless FAN card: two-line callout (commissioner variant keeps one line) */
+.slot__photo--nofan {
+  flex-direction: column;
+  gap: 8px;
+}
+.slot__photo-main { font-size: 12px; }
+.slot__photo-sub {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: none; /* client copy is lowercase — the stripes rule uppercases */
+  color: var(--pink);
+}
+
 .slot__photo--img {
   overflow: hidden;
   background: var(--card-alt);

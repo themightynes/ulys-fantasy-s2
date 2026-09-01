@@ -107,12 +107,49 @@
   cursor: pointer;
 }
 
-.scout__file-help {
+/* Full-width promoted photo block — dashed pink box (echoes .scout__consent) */
+.scout__photo-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  background: var(--card);
+  border: 1px dashed rgba(255, 62, 165, 0.55);
+  padding: 22px 18px;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.scout__photo-box:hover,
+.scout__photo-box:focus-within { border-color: var(--pink); }
+
+.scout__photo-glyph {
+  font-size: 30px;
+  line-height: 1;
+  text-align: center;
+}
+
+.scout__photo-help { margin-top: -2px; }
+
+/* Small text toggle that reveals the paste-a-link URL input */
+.scout__photo-toggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 10px 0;
+  min-height: var(--tap-min);
   font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: var(--ls-label);
-  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease);
 }
+.scout__photo-toggle:hover { color: var(--pink); }
+.scout__photo-toggle[aria-expanded="true"] { color: var(--pink); }
+
+.scout__photo-url[hidden] { display: none; }
 
 .scout__preview[hidden] { display: none; }
 
@@ -358,6 +395,64 @@
   flex-wrap: wrap;
   margin-top: 36px;
 }
+/* form.js hides the actions while the no-photo second chance is up */
+.takeover__actions[hidden] { display: none; }
+
+/* ---- No-photo second chance (card-only) --------------------------------- */
+.takeover__nophoto[hidden] { display: none; }
+
+.takeover__nophoto {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.takeover__nophoto-line {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--navy); /* navy on pink = 5.81:1 */
+  max-width: 460px;
+  margin: 0;
+}
+
+.takeover__nophoto-btn {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+  padding: 16px 28px;
+  min-height: 56px;
+  border: none;
+  border-radius: 0;
+  background: var(--navy);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+.takeover__nophoto-btn:hover { background: var(--navy-deep); }
+.takeover__nophoto-btn:active { transform: translateY(2px); }
+.takeover__nophoto-btn[hidden] { display: none; }
+
+.takeover__nophoto-skip {
+  background: none;
+  border: none;
+  color: var(--navy);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: var(--tap-min);
+  padding: 8px 12px;
+}
+.takeover__nophoto-skip:hover { text-decoration-thickness: 2.5px; }
+.takeover__nophoto-skip[hidden] { display: none; }
 
 .takeover__share,
 .takeover__card-btn,

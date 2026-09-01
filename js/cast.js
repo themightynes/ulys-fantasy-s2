@@ -20,7 +20,7 @@
                width: 600, height: 800,
                alt: 'Uly in his pink and cyan ULY’S FANTASY 16 jersey and backwards cap, throwing double peace signs.' } },
     { name: 'Elizabeth', label: 'Finished 3rd', sticker: 'heart',
-      bio: '"A black horse, Elizabeth played a very quiet and respectful game and to the surprise of literally everyone, ended up coming in third place."',
+      bio: '"A dark horse, Elizabeth played a very quiet and respectful game and to the surprise of literally everyone, ended up coming in third place."',
       photo: { src: 'assets/img/cast/elizabeth.jpg', width: 600, height: 800,
                alt: 'Elizabeth laughing at a restaurant table.' } },
     { name: 'Tim', label: 'Finished 4th', sticker: 'badge',

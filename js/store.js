@@ -21,6 +21,10 @@
      - addVote(id) → POSTs {action:'vote', id}; resolves {ok:true, votes}
        (votes = the new server count), rejects with a user-safe Error.
        Approved rows carry a numeric `votes` field (default 0).
+     - attachPhoto(id, dataUrl) → POSTs {action:'attachPhoto', id, photoData};
+       the backend parks the photo in the Sheet's photoPending column for
+       owner review (never public until promoted). Resolves {ok:true, id},
+       rejects with a user-safe Error.
      - setStatus() → throws; moderation lives in the Google Sheet.
    ========================================================================== */
 (function () {
@@ -166,6 +170,37 @@
             }));
           } catch (e) { /* event construction never blocks the data path */ }
           return { ok: true, votes: votes };
+        })
+        .catch(function (err) {
+          throw (err && err.ufSafe) ? err : friendlyError();
+        });
+    },
+
+    /**
+     * Crowd photo: file a headshot for an existing PHOTOLESS row. Same
+     * text/plain no-preflight POST pattern as addSubmission. The backend
+     * validates the image (jpeg/png/webp, ≤5MB decoded), saves it to Drive
+     * and writes the URL into the row's photoPending column — it appears
+     * publicly only after the owner promotes it during moderation.
+     * Resolves {ok:true, id}; rejects with a user-safe Error (unknown id,
+     * row already has a live photo, bad image, rate limit, network down).
+     */
+    attachPhoto: function (id, dataUrl) {
+      id = String(id || '').trim();
+      return fetch(UF_BACKEND_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'attachPhoto', id: id, photoData: String(dataUrl || '') }), // string body → text/plain, simple request
+        redirect: 'follow'
+      })
+        .then(function (res) {
+          if (!res.ok) throw friendlyError();
+          return res.json();
+        })
+        .then(function (out) {
+          if (!out || out.ok !== true) {
+            throw (out && out.error) ? safeError(String(out.error)) : friendlyError();
+          }
+          return { ok: true, id: id };
         })
         .catch(function (err) {
           throw (err && err.ufSafe) ? err : friendlyError();

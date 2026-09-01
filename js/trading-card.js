@@ -270,8 +270,10 @@
     ctx.rect(x, y, w, h);
     ctx.clip();
     // Match the board's face bias (object-position: center 18%): anchor the
-    // crop 18% from the image top instead of dead center.
-    var dy = (h - dh) * 0.18;
+    // crop 18% from the image top instead of dead center. Very tall portraits
+    // (height > 1.4× width — phone screenshots etc.) anchor to the very top,
+    // like the board's tall-photo rule, so the face stays in frame.
+    var dy = ih > 1.4 * iw ? 0 : (h - dh) * 0.18;
     ctx.drawImage(img, x + (w - dw) / 2, y + dy, dw, dh);
     ctx.restore();
   }

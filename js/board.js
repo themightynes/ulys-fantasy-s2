@@ -88,12 +88,130 @@
     return el('div', 'slot__photo slot__photo--stripes', label);
   }
 
-  /** Photoless FAN card fallback — two-line callout on the striped navy. */
-  function fanPlaceholder() {
+  /** Photoless FAN card fallback — two-line callout on the striped navy.
+   *  When a pick is passed (the genuinely-photoless render path, not the
+   *  broken-image fallback), the crowd-photo attach control rides along. */
+  function fanPlaceholder(pick) {
     var box = el('div', 'slot__photo slot__photo--stripes slot__photo--nofan');
     box.appendChild(el('span', 'slot__photo-main', 'NO HEADSHOT ON FILE'));
     box.appendChild(el('span', 'slot__photo-sub', 'scouts — we need visuals'));
+    if (pick && pick.id != null) box.appendChild(attachControl(pick));
     return box;
+  }
+
+  /* ---------- crowd photos (file a headshot for a photoless pick) ----------
+     The photo NEVER renders here — it lands in photoPending for Besties HQ
+     to review (moderation gate). renderBoard() rebuilds every card on the
+     refresh poll, so filed ids are remembered module-wide and re-render as
+     the success line instead of the button. */
+  var ATTACH_DONE_MSG = 'Filed. Besties HQ will review. 💋';
+  var ATTACH_FAIL_MSG = "Couldn't file that one — give it another go.";
+  var attachedIds = {}; // id → true once this session filed a headshot
+
+  var ATTACH_MAX_SIDE = 1600;      // longest side after client-side resize
+  var ATTACH_JPEG_QUALITY = 0.8;
+  var ATTACH_MAX_BYTES = 5 * 1024 * 1024; // hard fail past the backend ceiling
+
+  /** Downscale to ≤1600px longest side, export JPEG q0.8; resolve the
+   *  data-URL or reject with a user-safe Error. (Same approach as form.js's
+   *  compressPhoto — self-contained here so board.html needs no new file.) */
+  function compressAttachPhoto(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        try {
+          var scale = Math.min(1, ATTACH_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+          var w = Math.max(1, Math.round(img.naturalWidth * scale));
+          var h = Math.max(1, Math.round(img.naturalHeight * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          var cctx = canvas.getContext('2d');
+          cctx.fillStyle = '#FFFFFF'; // JPEG has no alpha — composite
+          cctx.fillRect(0, 0, w, h); // transparent PNGs onto white, not black
+          cctx.drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL('image/jpeg', ATTACH_JPEG_QUALITY);
+          // decoded bytes ≈ base64 length × 3/4 — hard-fail past the
+          // backend's 5MB decoded ceiling
+          var b64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+          if (b64.length * 0.75 > ATTACH_MAX_BYTES) {
+            reject(new Error("That photo is too thicc even after we squeezed it. Try a smaller one."));
+            return;
+          }
+          resolve(dataUrl);
+        } catch (e) {
+          reject(new Error("Couldn't read that photo. Try a JPG or PNG."));
+        }
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("Couldn't read that photo. Try a JPG or PNG."));
+      };
+      img.src = url;
+    });
+  }
+
+  /** The pink "got his headshot? file it →" control inside the placeholder.
+   *  Button → hidden file input → compress → UFStore.attachPhoto. Success
+   *  swaps the line to the filed message; errors show a brief note and the
+   *  button stays for a retry. Keyboard: it is a real <button>. */
+  function attachControl(pick) {
+    var wrap = el('div', 'slot__attach');
+    if (attachedIds[pick.id]) {
+      wrap.appendChild(el('span', 'slot__attach-done', ATTACH_DONE_MSG));
+      return wrap;
+    }
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'slot__attach-btn';
+    btn.textContent = 'got his headshot? file it →';
+    btn.setAttribute('aria-label', 'Got his headshot? File a photo of ' + pick.name + ' for review');
+
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.hidden = true;
+    input.setAttribute('aria-hidden', 'true');
+    input.tabIndex = -1;
+
+    var note = el('span', 'slot__attach-note', '');
+    note.setAttribute('role', 'status'); // errors/success announced politely
+
+    btn.addEventListener('click', function () { input.click(); });
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      if (!file) return;
+      btn.disabled = true;
+      note.textContent = 'Filing…';
+      compressAttachPhoto(file)
+        .then(function (dataUrl) {
+          if (!(window.UFStore && typeof window.UFStore.attachPhoto === 'function')) {
+            throw new Error(ATTACH_FAIL_MSG);
+          }
+          return window.UFStore.attachPhoto(pick.id, dataUrl);
+        })
+        .then(function () {
+          attachedIds[pick.id] = true;
+          // Do NOT show the photo — it is pending Besties HQ review. The note
+          // element (role=status) carries the message so it gets announced.
+          btn.remove();
+          note.className = 'slot__attach-done';
+          note.textContent = ATTACH_DONE_MSG;
+        })
+        .catch(function (err) {
+          input.value = '';
+          btn.disabled = false;
+          note.textContent = (err && err.message) || ATTACH_FAIL_MSG;
+        });
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(input);
+    wrap.appendChild(note);
+    return wrap;
   }
 
   function commishPhoto(pick) {
@@ -119,6 +237,14 @@
        frame is fixed-height, so no width/height hints (no CLS either way). */
     img.loading = 'lazy';
     img.decoding = 'async';
+    img.addEventListener('load', function () {
+      // Very tall portraits (phone screenshots etc.): the CSS default crop
+      // (50% 22%) lands mid-torso — anchor the crop to the top so the face
+      // stays in frame. Normal photos keep the stylesheet value.
+      if (img.naturalHeight > 1.4 * img.naturalWidth) {
+        img.style.objectPosition = '50% 0%';
+      }
+    });
     img.addEventListener('error', function () {
       var fallback = fanPlaceholder();
       if (frame.parentNode) frame.parentNode.replaceChild(fallback, frame);
@@ -285,7 +411,7 @@
       card.appendChild(photoPlaceholder('polaroid crop · fan photo'));
     } else {
       var url = safePhotoUrl(pick.photo);
-      card.appendChild(url ? fanPhoto(url, pick.name) : fanPlaceholder());
+      card.appendChild(url ? fanPhoto(url, pick.name) : fanPlaceholder(pick));
     }
 
     var body = el('div', 'slot__body');

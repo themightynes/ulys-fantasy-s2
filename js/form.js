@@ -170,21 +170,48 @@
       .then(function (list) {
         if (!Array.isArray(list)) throw new Error('bad players.json shape');
         var map = {};
-        var frag = document.createDocumentFragment();
         list.forEach(function (p) {
           if (!p || !p.n) return;
-          var opt = document.createElement('option');
-          opt.value = p.n; // datalist value = what fills the field; name only
-          frag.appendChild(opt);
           var key = p.n.toLowerCase();
           if (map[key]) map[key].ambiguous = true;
           else map[key] = { team: p.t, pos: p.p || '', ambiguous: false };
         });
-        datalist.appendChild(frag);
+        playerNames = list.filter(function (p) { return p && p.n; })
+          .map(function (p) { return p.n; });
         playersByName = map;
+        fillDatalist();
         maybeFillTeam();
       })
       .catch(function () { /* silent — field stays a plain text input */ });
+  }
+
+  /* WebKit freezes when a <datalist> holds thousands of options (the iOS
+     suggestion UI rebuilds against all of them while the keyboard opens).
+     So the datalist only ever holds the ≤ MAX_SUGGEST names matching the
+     current input (2+ chars), rebuilt per keystroke. */
+  var playerNames = null;
+  var MAX_SUGGEST = 40;
+  var lastSuggestKey = null;
+
+  function fillDatalist() {
+    if (!datalist || !playerNames) return;
+    var typed = fields.name.value.trim().toLowerCase();
+    var key = typed.length >= 2 ? typed : '';
+    if (key === lastSuggestKey) return;
+    lastSuggestKey = key;
+    while (datalist.firstChild) datalist.removeChild(datalist.firstChild);
+    if (!key) return;
+    var frag = document.createDocumentFragment();
+    var shown = 0;
+    for (var i = 0; i < playerNames.length && shown < MAX_SUGGEST; i++) {
+      if (playerNames[i].toLowerCase().indexOf(key) !== -1) {
+        var opt = document.createElement('option');
+        opt.value = playerNames[i];
+        frag.appendChild(opt);
+        shown++;
+      }
+    }
+    datalist.appendChild(frag);
   }
 
   function maybeFillTeam() {
@@ -236,7 +263,7 @@
 
   fields.name.addEventListener('focus', loadPlayers, { once: true });
   ['input', 'change'].forEach(function (evt) {
-    fields.name.addEventListener(evt, maybeFillTeam);
+    fields.name.addEventListener(evt, function () { fillDatalist(); maybeFillTeam(); });
   });
 
   /* ---- Duplicate soft nudge ----------------------------------------------
